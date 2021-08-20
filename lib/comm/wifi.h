@@ -10,7 +10,7 @@
 #include "esp_wifi.h"
 #include "esp_netif.h"
 
-namespace scale::comm {
+namespace scale::wifi {
     struct AP {
         std::string ssid;
         std::string wpa2Password;

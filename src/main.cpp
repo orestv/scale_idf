@@ -17,7 +17,7 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#include "comm.h"
+#include "wifi.h"
 
 extern "C" {
     void app_main(void);
@@ -37,18 +37,10 @@ void app_main(void)
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    scale::comm::AP ap = {
+    scale::wifi::AP ap = {
         .ssid = "Rift2.4",
         .wpa2Password = "breakdown"
     };
-    scale::comm::WifiClient client;
+    scale::wifi::WifiClient client;
     client.start(ap, 1);
-
-    // esp_netif_create_default_wifi_sta();
-
-    // wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    // ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-
-    // ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-    // wifi_init_sta();
 }

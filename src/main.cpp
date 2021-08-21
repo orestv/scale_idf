@@ -18,6 +18,7 @@
 #include "lwip/sys.h"
 
 #include "wifi.h"
+#include "mqtt.h"
 
 extern "C" {
     void app_main(void);
@@ -41,6 +42,9 @@ void app_main(void)
         .ssid = "Rift2.4",
         .wpa2Password = "breakdown"
     };
-    scale::wifi::WifiClient client;
-    client.start(ap, 1);
+    scale::wifi::WifiClient wifiClient(
+        { .hostname = "feeder" }
+    );
+    scale::mqtt::MQTTClient mqttClient;
+    wifiClient.start(ap, 1);
 }

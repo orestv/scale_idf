@@ -64,7 +64,9 @@ namespace scale::wifi {
         }
     }
 
-    WifiClient::WifiClient() {
+    WifiClient::WifiClient(const WifiConfig &wifiConfig) {
+        this->_wifiConfig = wifiConfig;
+
         this->_wifiEventGroup = xEventGroupCreate();
 
         ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
@@ -112,6 +114,11 @@ namespace scale::wifi {
         ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
         ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
         ESP_ERROR_CHECK(esp_wifi_start() );
+
+        esp_err_t err_set_hostname = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, _wifiConfig.hostname.c_str());
+        if (err_set_hostname != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to get hostname: %d", err_set_hostname);
+        }
 
         EventBits_t bits = xEventGroupWaitBits(
             this->_wifiEventGroup,

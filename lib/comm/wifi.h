@@ -16,13 +16,17 @@ namespace scale::wifi {
         std::string wpa2Password;
     };
 
+    struct WifiConfig {
+        std::string hostname;
+    };
+
     struct WifiEvents {
         bool isConnected = false;
     };
 
     class WifiClient {
     public:
-        WifiClient();
+        WifiClient(const WifiConfig &wifiConfig);
         void start(AP accessPoint, size_t accessPointsLen);
 
         EventGroupHandle_t eventGroup() {
@@ -34,6 +38,7 @@ namespace scale::wifi {
         static void static_wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
         void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
+        WifiConfig _wifiConfig;
         EventGroupHandle_t _wifiEventGroup;
     };
 }

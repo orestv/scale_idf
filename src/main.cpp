@@ -8,6 +8,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
+#include "driver/gpio.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
@@ -18,6 +19,7 @@
 #include "lwip/sys.h"
 
 #include "wifi.h"
+#include "led.h"
 #include "mqtt.h"
 
 extern "C" {
@@ -38,13 +40,21 @@ void app_main(void)
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    scale::wifi::AP ap = {
-        .ssid = "Rift2.4",
-        .wpa2Password = "breakdown"
+    // scale::wifi::AP ap = {
+    //     .ssid = "Rift2.4",
+    //     .wpa2Password = "breakdown"
+    // };
+    // scale::wifi::WifiClient wifiClient(
+    //     { .hostname = "feeder" }
+    // );
+    // scale::mqtt::MQTTClient mqttClient;
+    // wifiClient.start(ap, 1);
+
+    scale::led::LEDPins ledPins{
+        .gpio_red = GPIO_NUM_32,
+        .gpio_green = GPIO_NUM_25,
+        .gpio_blue = GPIO_NUM_26
     };
-    scale::wifi::WifiClient wifiClient(
-        { .hostname = "feeder" }
-    );
-    scale::mqtt::MQTTClient mqttClient;
-    wifiClient.start(ap, 1);
+    scale::led::LED led(ledPins);
+    led.start();
 }

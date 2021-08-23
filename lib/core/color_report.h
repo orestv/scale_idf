@@ -7,6 +7,8 @@ namespace scale::color {
     public:
         ColorReport(scale::led::LED &led) : _led(led) {}
 
+        void onWeightChanged(const float weight);
+
     private:
         scale::led::LED _led;
     };

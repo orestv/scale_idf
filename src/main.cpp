@@ -20,6 +20,7 @@
 
 #include "wifi.h"
 #include "led.h"
+#include "color_report.h"
 #include "mqtt.h"
 
 extern "C" {
@@ -47,10 +48,15 @@ void app_main(void)
     };
     scale::led::LED led(ledPins);
     led.start();
-    uint8_t red = 255;
+
+    scale::color::ColorReport color(led);
+    float weight = 60;
     while (true) {
-        led.setColor(red, 0, 0);
-        vTaskDelay(pdMS_TO_TICKS(20));
-        --red;
+
+        color.onWeightChanged(weight);
+        vTaskDelay(pdMS_TO_TICKS(30));
+
+        weight -= 0.5;
+        if (weight < 0) weight = 60;
     }
 }

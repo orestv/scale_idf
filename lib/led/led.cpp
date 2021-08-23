@@ -70,11 +70,7 @@ namespace scale::led {
     }
 
     void LED::setColor(uint8_t red, uint8_t green, uint8_t blue) {
-        Color color = {
-            .red = red,
-            .green = green,
-            .blue = blue
-        };
+        Color color(red, green, blue);
         this->setColor(color);
     }
 

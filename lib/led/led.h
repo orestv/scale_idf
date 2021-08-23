@@ -11,10 +11,10 @@ namespace scale::led {
         gpio_num_t gpio_blue;
     };
 
-    enum LedColor {
-        LED_RED = 0,
-        LED_GREEN = 1,
-        LED_BLUE = 2
+    struct Color {
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
     };
 
     class LED {
@@ -25,12 +25,19 @@ namespace scale::led {
             }
 
             void start();
+            void setColor(const Color &color);
+            void setColor(uint8_t red, uint8_t green, uint8_t blue);
         private:
-            void setLevel(LedColor, float level);
+            enum LedColor {
+                LED_RED = 0,
+                LED_GREEN = 1,
+                LED_BLUE = 2
+            };
+
+            void setLevel(LedColor ledColor, float level);
             int maxDuty() const;
 
             LEDPins _pins;
-
             ledc_channel_t _channels[3];
     };
 }

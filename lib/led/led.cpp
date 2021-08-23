@@ -7,6 +7,8 @@
 #include "esp_log.h"
 
 #include <math.h>
+#include <array>
+#include <limits>
 
 #define LEDC_TIMER              LEDC_TIMER_0
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
@@ -53,6 +55,27 @@ namespace scale::led {
         setLevel(LED_RED, 0.4);
         setLevel(LED_GREEN, 0);
         setLevel(LED_BLUE, 0);
+    }
+
+    void LED::setColor(const Color &color) {
+        std::array<uint8_t, 3> components = {color.red, color.green, color.blue};
+        auto maxComponentValue = std::numeric_limits<uint8_t>::max();
+        std::array<LedColor, 3> colors = {LED_RED, LED_GREEN, LED_BLUE};
+
+        for (int i = 0; i < components.size(); ++i) {
+            auto level = (float)components[i] / maxComponentValue;
+            auto color = colors[i];
+            setLevel(color, level);
+        }
+    }
+
+    void LED::setColor(uint8_t red, uint8_t green, uint8_t blue) {
+        Color color = {
+            .red = red,
+            .green = green,
+            .blue = blue
+        };
+        this->setColor(color);
     }
 
     void LED::setLevel(LedColor color, float level) {

@@ -60,10 +60,7 @@ void app_main(void)
         .gpio_blue = GPIO_PIN_RGB_BLUE,
     };
     scale::led::LED led(ledPins);
-    led.start();
-
     scale::color::ColorReport color(led);
-
     scale::peri::button::PushButton buttonTare(
         {
             .buttonGPIO = GPIO_PIN_BUTTON_TARE,
@@ -74,9 +71,6 @@ void app_main(void)
             .buttonGPIO = GPIO_PIN_BUTTON_MAINTENANCE,
         }
     );
-
-    buttonTare.start();
-    buttonMaintenance.start();
 
     float weight = 60;
     while (true) {

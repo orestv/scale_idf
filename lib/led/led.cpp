@@ -51,10 +51,6 @@ namespace scale::led {
             };
             ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
         }
-
-        setLevel(LED_RED, 0.4);
-        setLevel(LED_GREEN, 0);
-        setLevel(LED_BLUE, 0);
     }
 
     void LED::setColor(const Color &color) {

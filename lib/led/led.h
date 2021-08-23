@@ -25,9 +25,10 @@ namespace scale::led {
             LED(const LEDPins &pins) : 
                     _pins(pins),
                     _channels{LEDC_CHANNEL_0, LEDC_CHANNEL_1, LEDC_CHANNEL_2} {
+                
+                start();
             }
 
-            void start();
             void setColor(const Color &color);
             void setColor(uint8_t red, uint8_t green, uint8_t blue);
         private:
@@ -36,6 +37,8 @@ namespace scale::led {
                 LED_GREEN = 1,
                 LED_BLUE = 2
             };
+            
+            void start();
 
             void setLevel(LedColor ledColor, float level);
             int maxDuty() const;

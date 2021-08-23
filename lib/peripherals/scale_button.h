@@ -25,15 +25,16 @@ namespace scale::peri::button {
         PushButton(const ButtonConfig &config): _config(config) {
             _debouncer = Debouncer();
             _buttonEventQueue = xQueueCreate(10, sizeof(gpio_num_t));
+            start();
         }
 
-        void start();
 
     private:
         static void IRAM_ATTR gpio_isr_handler(void* arg);
         static void gpioTask(void *arg);
 
         std::string tag() const;
+        void start();
 
         Debouncer _debouncer;
         xQueueHandle _buttonEventQueue;

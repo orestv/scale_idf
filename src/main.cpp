@@ -40,16 +40,6 @@ void app_main(void)
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    // scale::wifi::AP ap = {
-    //     .ssid = "Rift2.4",
-    //     .wpa2Password = "breakdown"
-    // };
-    // scale::wifi::WifiClient wifiClient(
-    //     { .hostname = "feeder" }
-    // );
-    // scale::mqtt::MQTTClient mqttClient;
-    // wifiClient.start(ap, 1);
-
     scale::led::LEDPins ledPins{
         .gpio_red = GPIO_NUM_32,
         .gpio_green = GPIO_NUM_25,
@@ -57,4 +47,10 @@ void app_main(void)
     };
     scale::led::LED led(ledPins);
     led.start();
+    uint8_t red = 255;
+    while (true) {
+        led.setColor(red, 0, 0);
+        vTaskDelay(pdMS_TO_TICKS(20));
+        --red;
+    }
 }

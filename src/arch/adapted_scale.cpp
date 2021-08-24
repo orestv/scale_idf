@@ -1,5 +1,7 @@
 #include "adapted_scale.h"
 
+#include "esp_log.h"
+
 namespace scale::weight {
     void AdaptedScale::start() {
         xTaskCreate(AdaptedScale::processTask, "AdaptedScaleProcess", 2048, this, 10, nullptr);
@@ -16,6 +18,10 @@ namespace scale::weight {
                 xQueueSend(_this._eventQueue, &outgoingEvent, portMAX_DELAY);
             }
         }
+    }
+
+    void AdaptedScale::tare() {
+        ESP_LOGI("AdaptedScale", "Taring...");
     }
 
     ScaleEvent AdaptedScale::convertEvent(const raw::ScaleEvent &incomingEvent) const {

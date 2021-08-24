@@ -43,7 +43,7 @@ namespace scale::weight::raw {
                 .rawData = data,
             };
             xQueueSend(_this->queue(), &event, portMAX_DELAY);
-            ESP_LOGI(_this->tag().c_str(), "Raw data: %d", data);
+            // ESP_LOGI(_this->tag().c_str(), "Raw data: %d", data);
             vTaskDelay(pdMS_TO_TICKS(500));
         }
     }

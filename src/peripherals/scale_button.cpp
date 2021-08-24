@@ -27,7 +27,7 @@ namespace scale::peri::button {
         gpio_isr_handler_add(_config.buttonGPIO, PushButton::gpio_isr_handler, this);
         ESP_LOGI(tag().c_str(), "ISR Handler installed");
 
-        xTaskCreate(PushButton::gpioTask, tag().c_str(), 2048, this, 10, nullptr);
+        // xTaskCreate(PushButton::gpioTask, tag().c_str(), 2048, this, 10, nullptr);
     }
 
     std::string PushButton::tag() const {
@@ -38,10 +38,10 @@ namespace scale::peri::button {
 
     void PushButton::gpioTask(void *arg) {
         PushButton *_this = (PushButton*)arg;
-        uint32_t io_num;
         while (true) {
-            if (xQueueReceive(_this->_buttonEventQueue, &io_num, portMAX_DELAY)) {
-                ESP_LOGI(_this->tag().c_str(), "Button clicked: %d", io_num);
+            ButtonEvent evt;
+            if (xQueueReceive(_this->_buttonEventQueue, &evt, portMAX_DELAY)) {
+                ESP_LOGI(_this->tag().c_str(), "Button clicked");
             }
         }
     }
@@ -49,8 +49,8 @@ namespace scale::peri::button {
     void IRAM_ATTR PushButton::gpio_isr_handler(void* arg) {
         PushButton *_this = (PushButton*)arg;
         if (_this->_debouncer.trigger()) {
-            uint32_t gpio_num = _this->_config.buttonGPIO;
-            xQueueSendFromISR(_this->_buttonEventQueue, &gpio_num, NULL);
+            ButtonEvent evt;
+            xQueueSendFromISR(_this->_buttonEventQueue, &evt, NULL);
         }
     }
 }

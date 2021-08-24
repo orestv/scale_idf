@@ -30,6 +30,8 @@
 
 #include "adapted_scale.h"
 
+#include "scale_tasks.h"
+
 #define ESP_INTR_FLAG_DEFAULT 0
 
 const gpio_num_t GPIO_RGB_RED = GPIO_NUM_32;
@@ -46,8 +48,8 @@ extern "C" {
     void app_main(void);
 }
 
-void app_main(void)
-{
+void init_esp() {
+
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -55,12 +57,14 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-
     ESP_ERROR_CHECK(esp_netif_init());
-
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-
     ESP_ERROR_CHECK(gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT));
+}
+
+void app_main(void)
+{
+    init_esp();
 
     scale::led::LEDPins ledPins{
         .gpio_red = GPIO_RGB_RED,
@@ -95,6 +99,13 @@ void app_main(void)
     );
 
     scale::weight::AdaptedScale adaptedScale(scale, converter);
+
+    scale::tasks::TaskArgTareButton taskArgs = {
+        .scale = adaptedScale,
+        .button = buttonTare,
+    };
+
+    scale::tasks::startTaskTareButton(taskArgs);
 
     while (true) {
         scale::weight::ScaleEvent event;

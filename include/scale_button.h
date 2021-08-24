@@ -11,6 +11,10 @@ namespace scale::peri::button {
         gpio_num_t buttonGPIO;
     };
 
+    struct ButtonEvent {
+
+    };
+
     class Debouncer {
     public:
         Debouncer(uint32_t debounceMillis = 750): _debounceMillis(debounceMillis) {}
@@ -24,10 +28,13 @@ namespace scale::peri::button {
     public:
         PushButton(const ButtonConfig &config): _config(config) {
             _debouncer = Debouncer();
-            _buttonEventQueue = xQueueCreate(10, sizeof(gpio_num_t));
+            _buttonEventQueue = xQueueCreate(10, sizeof(ButtonEvent));
             start();
         }
 
+        xQueueHandle queue() const {
+            return _buttonEventQueue;
+        }
 
     private:
         static void IRAM_ATTR gpio_isr_handler(void* arg);

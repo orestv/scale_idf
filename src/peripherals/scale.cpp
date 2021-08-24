@@ -6,7 +6,7 @@
 
 #include "esp_log.h"
 
-namespace scale::weight {
+namespace scale::weight::raw {
 
     void Scale::start() {
         ESP_LOGI(tag().c_str(), "Starting the scale");
@@ -39,7 +39,10 @@ namespace scale::weight {
                 ESP_LOGE(_this->tag().c_str(), "Could not read data: %d (%s)", r, esp_err_to_name(r));
                 continue;
             }
-
+            ScaleEvent event = {
+                .rawData = data,
+            };
+            xQueueSend(_this->queue(), &event, portMAX_DELAY);
             ESP_LOGI(_this->tag().c_str(), "Raw data: %d", data);
             vTaskDelay(pdMS_TO_TICKS(500));
         }

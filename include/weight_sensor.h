@@ -4,15 +4,20 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/queue.h>
 
 #include "driver/gpio.h"
 
 #include <hx711.h>
 
-namespace scale::weight {
+namespace scale::weight::raw {
     struct ScaleConfig {
         gpio_num_t gpioDAT;
         gpio_num_t gpioCLK;
+    };
+
+    struct ScaleEvent {
+        int rawData;
     };
 
     class Scale {
@@ -23,7 +28,12 @@ namespace scale::weight {
                 .pd_sck = _config.gpioCLK,
                 .gain = HX711_GAIN_A_128
             };
+            _scaleEventQueue = xQueueCreate(20, sizeof(ScaleEvent));
             start();
+        }
+
+        xQueueHandle queue() const {
+            return _scaleEventQueue;
         }
 
     private:
@@ -33,6 +43,7 @@ namespace scale::weight {
         static void process(void *arg);
 
         hx711_t _dev;
+        xQueueHandle _scaleEventQueue;
         ScaleConfig _config;
     };
 }

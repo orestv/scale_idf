@@ -26,6 +26,9 @@
 #include "scale_button.h"
 
 #include "weight_sensor.h"
+#include "weight_converter.h"
+
+#include "adapted_scale.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
 
@@ -77,20 +80,26 @@ void app_main(void)
         }
     );
 
-    scale::weight::Scale scale(
+    scale::weight::raw::Scale scale(
         {
             .gpioDAT = GPIO_HX711_DAT,
             .gpioCLK = GPIO_HX711_CLK,
         }
     );
 
-    float weight = 60;
+    scale::weight::raw::GramConverter converter(
+        {
+            .zero = -20000,
+            .coefficient = 1,
+        }
+    );
+
+    scale::weight::AdaptedScale adaptedScale(scale, converter);
+
     while (true) {
-
-        color.onWeightChanged(weight);
-        vTaskDelay(pdMS_TO_TICKS(30));
-
-        weight -= 0.5;
-        if (weight < 0) weight = 60;
+        scale::weight::ScaleEvent event;
+        if (xQueueReceive(adaptedScale.queue(), &event, portMAX_DELAY)) {
+            ESP_LOGI("Q", "Received weight: %fg", event.grams);
+        }
     }
 }

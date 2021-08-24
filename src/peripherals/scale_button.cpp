@@ -26,24 +26,12 @@ namespace scale::peri::button {
         ESP_LOGI(tag().c_str(), "Configuring button on GPIO %d", _config.buttonGPIO);
         gpio_isr_handler_add(_config.buttonGPIO, PushButton::gpio_isr_handler, this);
         ESP_LOGI(tag().c_str(), "ISR Handler installed");
-
-        // xTaskCreate(PushButton::gpioTask, tag().c_str(), 2048, this, 10, nullptr);
     }
 
     std::string PushButton::tag() const {
         std::ostringstream oss;
         oss << "Button_" << _config.buttonGPIO;
         return oss.str();
-    }
-
-    void PushButton::gpioTask(void *arg) {
-        PushButton *_this = (PushButton*)arg;
-        while (true) {
-            ButtonEvent evt;
-            if (xQueueReceive(_this->_buttonEventQueue, &evt, portMAX_DELAY)) {
-                ESP_LOGI(_this->tag().c_str(), "Button clicked");
-            }
-        }
     }
 
     void IRAM_ATTR PushButton::gpio_isr_handler(void* arg) {

@@ -38,7 +38,6 @@ namespace scale::peri::button {
 
     private:
         static void IRAM_ATTR gpio_isr_handler(void* arg);
-        static void gpioTask(void *arg);
 
         std::string tag() const;
         void start();

@@ -96,7 +96,7 @@ void app_main(void)
     scale::weight::raw::GramConverter converter(
         {
             .zero = -20000,
-            .coefficient = 1,
+            .coefficient = 0.00106,
         }
     );
 

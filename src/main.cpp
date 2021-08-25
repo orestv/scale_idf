@@ -29,8 +29,10 @@
 #include "weight_converter.h"
 
 #include "adapted_scale.h"
+#include "tare_controller.h"
 
 #include "scale_tasks.h"
+#include "state_machine.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
 
@@ -99,13 +101,31 @@ void app_main(void)
     );
 
     scale::weight::AdaptedScale adaptedScale(rawScale, converter);
+    
+    scale::tare::TareConfig defaultTareConfig;
+    scale::tare::TareConfigBuilder tareConfigBuilder;
+    scale::tare::Tare tare(defaultTareConfig);
 
-    scale::tasks::TaskArgTareButton taskArgs = {
-        .scale = adaptedScale,
+    scale::state::StateMachine stateMachine;
+
+    scale::tasks::TaskArgTareButton taskArgsTareButton = {
+        .stateMachine = stateMachine,
         .button = buttonTare,
+        .tareConfigBuilder = tareConfigBuilder,
+    };
+    scale::tasks::TaskArgReportWeight taskArgsReportWeight = {
+        .adaptedScale = adaptedScale,
+        .stateMachine = stateMachine,
+        .tare = tare,
+        .tareConfigBuilder = tareConfigBuilder,
     };
 
-    scale::tasks::startTaskTareButton(taskArgs);
+    scale::tasks::startTaskTareButton(taskArgsTareButton);
+    scale::tasks::startTaskReportWeight(taskArgsReportWeight);
+
+    while (true) {
+        vTaskDelay(portMAX_DELAY);
+    }
 
     while (true) {
         scale::weight::ScaleEvent event;

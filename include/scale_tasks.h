@@ -25,7 +25,6 @@ namespace scale::tasks {
             scale::peri::button::ButtonEvent evt;
             if (xQueueReceive(taskArg.button.queue(), &evt, portMAX_DELAY)) {
                 ESP_LOGI("TaskTareButton", "Received button event");
-                taskArg.scale.tare();
             }
         }
     }

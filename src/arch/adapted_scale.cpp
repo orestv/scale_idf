@@ -14,14 +14,14 @@ namespace scale::weight {
             raw::ScaleEvent incomingEvent;
 
             if (xQueueReceive(_this._scale.queue(), &incomingEvent, portMAX_DELAY)) {
-                ScaleEvent outgoingEvent = _this.convertEvent(incomingEvent);
-                xQueueSend(_this._eventQueue, &outgoingEvent, portMAX_DELAY);
+                _this.processEvent(incomingEvent);
             }
         }
     }
 
-    void AdaptedScale::tare() {
-        ESP_LOGI("AdaptedScale", "Taring...");
+    void AdaptedScale::processEvent(const raw::ScaleEvent &incomingEvent) {
+        ScaleEvent outgoingEvent = this->convertEvent(incomingEvent);
+        xQueueSend(this->_eventQueue, &outgoingEvent, portMAX_DELAY);
     }
 
     ScaleEvent AdaptedScale::convertEvent(const raw::ScaleEvent &incomingEvent) const {

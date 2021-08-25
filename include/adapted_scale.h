@@ -4,6 +4,8 @@
 #include <freertos/task.h>
 #include <freertos/queue.h>
 
+#include <vector>
+
 #include "weight_sensor.h"
 #include "weight_converter.h"
 
@@ -21,9 +23,7 @@ namespace scale::weight {
             _eventQueue = xQueueCreate(20, sizeof(ScaleEvent));
 
             start();
-        }
-
-        void tare();     
+        }  
 
         xQueueHandle queue() const {
             return _eventQueue;
@@ -33,6 +33,7 @@ namespace scale::weight {
         void start();
 
         ScaleEvent convertEvent(const raw::ScaleEvent &incomingEvent) const;
+        void processEvent(const raw::ScaleEvent &incomingEvent);
 
         static void processTask(void *arg);
 

@@ -12,7 +12,6 @@ namespace scale::weight::raw {
         GramConverter(const GramConverterConfig &config): _config(config) {} 
         
         float grams(int raw_data) const;
-
     private:
         GramConverterConfig _config;
     };

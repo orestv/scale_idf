@@ -84,7 +84,7 @@ void app_main(void)
         }
     );
 
-    scale::weight::raw::Scale scale(
+    scale::weight::raw::Scale rawScale(
         {
             .gpioDAT = GPIO_HX711_DAT,
             .gpioCLK = GPIO_HX711_CLK,
@@ -98,7 +98,7 @@ void app_main(void)
         }
     );
 
-    scale::weight::AdaptedScale adaptedScale(scale, converter);
+    scale::weight::AdaptedScale adaptedScale(rawScale, converter);
 
     scale::tasks::TaskArgTareButton taskArgs = {
         .scale = adaptedScale,

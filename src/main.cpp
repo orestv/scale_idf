@@ -28,6 +28,8 @@
 #include "raw_scale.h"
 #include "weight_converter.h"
 
+#include "stabilizer.h"
+#include "stabilized_scale.h"
 #include "adapted_scale.h"
 #include "tare_controller.h"
 
@@ -100,8 +102,10 @@ void app_main(void)
         }
     );
 
+    scale::stabilized::Stabilizer stabilizer({.dataPoints=5, .margin=0.5});
+    
     scale::adapted::AdaptedScale adaptedScale(rawScale, converter);
-    scale::stabilized::StabilizedScale stabilizedScale(adaptedScale);
+    scale::stabilized::StabilizedScale stabilizedScale(adaptedScale, stabilizer);
     
     scale::tare::TareConfig defaultTareConfig;
     scale::tare::TareConfigBuilder tareConfigBuilder;

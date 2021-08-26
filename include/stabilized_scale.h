@@ -19,9 +19,9 @@ namespace scale::stabilized {
 
     class StabilizedScale {
     public:
-        StabilizedScale(adapted::AdaptedScale &adaptedScale): 
+        StabilizedScale(adapted::AdaptedScale &adaptedScale, Stabilizer &stabilizer): 
                 _adaptedScale(adaptedScale),
-                _stabilizer({.dataPoints=10, .margin=0.5}) {
+                _stabilizer(stabilizer) {
             _eventQueue = xQueueCreate(10, sizeof(ScaleEvent));
         }
         void start();

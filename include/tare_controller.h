@@ -14,7 +14,7 @@ namespace scale::tare {
         bool isTareReady() const;
         TareConfig config() const;
     private:
-        int MAX_BUFFER_SIZE = 4;
+        int MAX_BUFFER_SIZE = 1;
 
         std::vector<float> _tareBuffer;
     };

@@ -13,12 +13,22 @@ namespace scale::stabilized {
     void StabilizedScale::task() {
         while (true) {
             scale::adapted::ScaleEvent incomingEvent = _adaptedScale.getEvent();
-            ScaleEvent outgoingEvent = {
-                .eventType=EVENT_WEIGHT,
-                .grams=incomingEvent.grams,
-            };
-            xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
+            processEvent(incomingEvent);
         }        
+    }
+
+    void StabilizedScale::processEvent(const adapted::ScaleEvent &incomingEvent) {
+        _stabilizer.push(incomingEvent.grams);
+        if (!_stabilizer.isStable()) {
+            // todo: send unstable scale event
+            return;
+        }
+        float stabilizedValue = _stabilizer.getValue();
+        ScaleEvent outgoingEvent = {
+            .eventType=EVENT_WEIGHT,
+            .grams=stabilizedValue,
+        };
+        xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
     }
 
     ScaleEvent StabilizedScale::getEvent() {

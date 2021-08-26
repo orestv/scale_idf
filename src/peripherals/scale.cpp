@@ -6,7 +6,7 @@
 
 #include "esp_log.h"
 
-namespace scale::weight::raw {
+namespace scale::raw {
 
     void Scale::start() {
         ESP_LOGI(tag().c_str(), "Starting the scale");

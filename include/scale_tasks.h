@@ -19,7 +19,7 @@ namespace scale::tasks {
     };
 
     struct TaskArgReportWeight {
-        scale::weight::AdaptedScale &adaptedScale;
+        scale::adapted::AdaptedScale &adaptedScale;
         scale::state::StateMachine &stateMachine;
         scale::tare::Tare &tare;
         scale::tare::TareConfigBuilder &tareConfigBuilder;
@@ -44,14 +44,14 @@ namespace scale::tasks {
         TaskArgReportWeight &taskArg = *(TaskArgReportWeight*)arg;
         const char *TAG = "ReportWeight";
         while (true) {
-            scale::weight::ScaleEvent event;
+            scale::adapted::ScaleEvent event;
             if (xQueueReceive(taskArg.adaptedScale.queue(), &event, portMAX_DELAY)) {
-                ESP_LOGI(TAG, "Received weight: %fg", event.grams);                
+                // ESP_LOGI(TAG, "Received weight: %fg", event.grams);                
 
                 switch (taskArg.stateMachine.state()) {
                     case scale::state::SCALE_STATE_NORMAL: {
                         float taredWeight = taskArg.tare.tare(event.grams);
-                        ESP_LOGI(TAG, "Reporting weight %fg", taredWeight);
+                        ESP_LOGI(TAG, "                   %fg", taredWeight);
                         break;
                     }
                     case scale::state::SCALE_STATE_TARE: {

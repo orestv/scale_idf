@@ -9,7 +9,7 @@
 #include "weight_sensor.h"
 #include "weight_converter.h"
 
-namespace scale::weight {
+namespace scale::adapted {
     struct ScaleEvent {
         float grams;
     };

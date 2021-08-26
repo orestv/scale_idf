@@ -2,7 +2,7 @@
 
 #include "esp_log.h"
 
-namespace scale::weight {
+namespace scale::adapted {
     void AdaptedScale::start() {
         xTaskCreate(AdaptedScale::processTask, "AdaptedScaleProcess", 2048, this, 10, nullptr);
     }

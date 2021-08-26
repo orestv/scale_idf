@@ -10,7 +10,7 @@
 
 #include <hx711.h>
 
-namespace scale::weight::raw {
+namespace scale::raw {
     struct ScaleConfig {
         gpio_num_t gpioDAT;
         gpio_num_t gpioCLK;

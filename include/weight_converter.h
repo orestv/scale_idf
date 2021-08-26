@@ -1,6 +1,6 @@
 #pragma once
 
-namespace scale::weight::raw {
+namespace scale::raw {
 
     struct GramConverterConfig {
         int zero;

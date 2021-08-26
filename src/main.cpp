@@ -86,21 +86,21 @@ void app_main(void)
         }
     );
 
-    scale::weight::raw::Scale rawScale(
+    scale::raw::Scale rawScale(
         {
             .gpioDAT = GPIO_HX711_DAT,
             .gpioCLK = GPIO_HX711_CLK,
         }
     );
 
-    scale::weight::raw::GramConverter converter(
+    scale::raw::GramConverter converter(
         {
             .zero = -20000,
             .coefficient = 0.00106,
         }
     );
 
-    scale::weight::AdaptedScale adaptedScale(rawScale, converter);
+    scale::adapted::AdaptedScale adaptedScale(rawScale, converter);
     
     scale::tare::TareConfig defaultTareConfig;
     scale::tare::TareConfigBuilder tareConfigBuilder;
@@ -128,7 +128,7 @@ void app_main(void)
     }
 
     while (true) {
-        scale::weight::ScaleEvent event;
+        scale::adapted::ScaleEvent event;
         if (xQueueReceive(adaptedScale.queue(), &event, portMAX_DELAY)) {
             ESP_LOGI("Q", "Received weight: %fg", event.grams);
         }

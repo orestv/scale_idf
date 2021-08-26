@@ -13,16 +13,17 @@ namespace scale::stabilized {
 
     struct ScaleEvent {
         EventType eventType;
-        float grams = 0;
+        float grams;
     };
 
     class StabilizedScale {
     public:
-        StabilizedScale(adapted::AdaptedScale &adaptedScale): _adaptedScale(adaptedScale) {}
-
+        StabilizedScale(adapted::AdaptedScale &adaptedScale): _adaptedScale(adaptedScale) {
+            _eventQueue = xQueueCreate(10, sizeof(ScaleEvent));
+        }
+        void start();
         ScaleEvent getEvent();
     private:
-        void start();
         void task();
         xQueueHandle _eventQueue;
         adapted::AdaptedScale _adaptedScale;

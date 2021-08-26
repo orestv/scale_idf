@@ -101,6 +101,7 @@ void app_main(void)
     );
 
     scale::adapted::AdaptedScale adaptedScale(rawScale, converter);
+    scale::stabilized::StabilizedScale stabilizedScale(adaptedScale);
     
     scale::tare::TareConfig defaultTareConfig;
     scale::tare::TareConfigBuilder tareConfigBuilder;
@@ -114,11 +115,13 @@ void app_main(void)
         .tareConfigBuilder = tareConfigBuilder,
     };
     scale::tasks::TaskArgReportWeight taskArgsReportWeight = {
-        .adaptedScale = adaptedScale,
+        .stabilizedScale = stabilizedScale,
         .stateMachine = stateMachine,
         .tare = tare,
         .tareConfigBuilder = tareConfigBuilder,
     };
+
+    stabilizedScale.start();
 
     scale::tasks::startTaskTareButton(taskArgsTareButton);
     scale::tasks::startTaskReportWeight(taskArgsReportWeight);

@@ -13,6 +13,11 @@ namespace scale::stabilized {
     void StabilizedScale::task() {
         while (true) {
             scale::adapted::ScaleEvent incomingEvent = _adaptedScale.getEvent();
+            ScaleEvent outgoingEvent = {
+                .eventType=EVENT_WEIGHT,
+                .grams=incomingEvent.grams,
+            };
+            xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
         }        
     }
 

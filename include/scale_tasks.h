@@ -9,6 +9,7 @@
 #include "tare_controller.h"
 #include "scale_button.h"
 #include "state_machine.h"
+#include "stabilized_scale.h"
 
 namespace scale::tasks {
 
@@ -19,7 +20,7 @@ namespace scale::tasks {
     };
 
     struct TaskArgReportWeight {
-        scale::adapted::AdaptedScale &adaptedScale;
+        scale::stabilized::StabilizedScale &stabilizedScale;
         scale::state::StateMachine &stateMachine;
         scale::tare::Tare &tare;
         scale::tare::TareConfigBuilder &tareConfigBuilder;
@@ -44,7 +45,7 @@ namespace scale::tasks {
         TaskArgReportWeight &taskArg = *(TaskArgReportWeight*)arg;
         const char *TAG = "ReportWeight";
         while (true) {
-            scale::adapted::ScaleEvent event = taskArg.adaptedScale.getEvent();
+            scale::stabilized::ScaleEvent event = taskArg.stabilizedScale.getEvent();
             
             switch (taskArg.stateMachine.state()) {
                 case scale::state::SCALE_STATE_NORMAL: {

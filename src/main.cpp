@@ -25,7 +25,7 @@
 
 #include "scale_button.h"
 
-#include "weight_sensor.h"
+#include "raw_scale.h"
 #include "weight_converter.h"
 
 #include "adapted_scale.h"
@@ -95,8 +95,8 @@ void app_main(void)
 
     scale::raw::GramConverter converter(
         {
-            .zero = -20000,
-            .coefficient = 0.00106,
+            .zero = 0,
+            .coefficient = 0.0018,
         }
     );
 
@@ -125,12 +125,5 @@ void app_main(void)
 
     while (true) {
         vTaskDelay(portMAX_DELAY);
-    }
-
-    while (true) {
-        scale::adapted::ScaleEvent event;
-        if (xQueueReceive(adaptedScale.queue(), &event, portMAX_DELAY)) {
-            ESP_LOGI("Q", "Received weight: %fg", event.grams);
-        }
     }
 }

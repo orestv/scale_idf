@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "weight_sensor.h"
+#include "raw_scale.h"
 #include "weight_converter.h"
 
 namespace scale::adapted {
@@ -23,11 +23,9 @@ namespace scale::adapted {
             _eventQueue = xQueueCreate(20, sizeof(ScaleEvent));
 
             start();
-        }  
+        }
 
-        xQueueHandle queue() const {
-            return _eventQueue;
-        }   
+        ScaleEvent getEvent();
 
     private:
         void start();
@@ -35,7 +33,7 @@ namespace scale::adapted {
         ScaleEvent convertEvent(const raw::ScaleEvent &incomingEvent) const;
         void processEvent(const raw::ScaleEvent &incomingEvent);
 
-        static void processTask(void *arg);
+        void task();
 
         raw::Scale &_scale;
         raw::GramConverter &_converter;

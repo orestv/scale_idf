@@ -26,16 +26,13 @@ namespace scale::raw {
             _dev = {
                 .dout = _config.gpioDAT,
                 .pd_sck = _config.gpioCLK,
-                .gain = HX711_GAIN_A_128
+                .gain = HX711_GAIN_A_64
             };
             _scaleEventQueue = xQueueCreate(20, sizeof(ScaleEvent));
             start();
         }
 
-        xQueueHandle queue() const {
-            return _scaleEventQueue;
-        }
-
+        ScaleEvent getEvent();
     private:
         void start();
         std::string tag() const;

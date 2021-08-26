@@ -4,19 +4,22 @@
 
 namespace scale::adapted {
     void AdaptedScale::start() {
-        xTaskCreate(AdaptedScale::processTask, "AdaptedScaleProcess", 2048, this, 10, nullptr);
+        xTaskCreate(
+            [](void *arg) {((AdaptedScale*)arg)->task();},
+            "AdaptedScaleProcess", 2048, this, 10, nullptr);
     }
 
-    void AdaptedScale::processTask(void *arg) {
-        AdaptedScale &_this = *((AdaptedScale*)arg);
-
+    void AdaptedScale::task() {
         while (true) {
-            raw::ScaleEvent incomingEvent;
-
-            if (xQueueReceive(_this._scale.queue(), &incomingEvent, portMAX_DELAY)) {
-                _this.processEvent(incomingEvent);
-            }
+            raw::ScaleEvent incomingEvent = _scale.getEvent();
+            processEvent(incomingEvent);
         }
+    }
+
+    ScaleEvent AdaptedScale::getEvent() {
+        ScaleEvent event;
+        xQueueReceive(this->_eventQueue, &event, portMAX_DELAY);
+        return event;
     }
 
     void AdaptedScale::processEvent(const raw::ScaleEvent &incomingEvent) {

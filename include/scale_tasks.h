@@ -44,25 +44,22 @@ namespace scale::tasks {
         TaskArgReportWeight &taskArg = *(TaskArgReportWeight*)arg;
         const char *TAG = "ReportWeight";
         while (true) {
-            scale::adapted::ScaleEvent event;
-            if (xQueueReceive(taskArg.adaptedScale.queue(), &event, portMAX_DELAY)) {
-                // ESP_LOGI(TAG, "Received weight: %fg", event.grams);                
-
-                switch (taskArg.stateMachine.state()) {
-                    case scale::state::SCALE_STATE_NORMAL: {
-                        float taredWeight = taskArg.tare.tare(event.grams);
-                        ESP_LOGI(TAG, "                   %fg", taredWeight);
-                        break;
-                    }
-                    case scale::state::SCALE_STATE_TARE: {
-                        ESP_LOGI(TAG, "Pushing value into tare");
-                        taskArg.tareConfigBuilder.push(event.grams);
-                        if (taskArg.tareConfigBuilder.isTareReady()) {
-                            ESP_LOGI(TAG, "Tare ready");
-                            taskArg.tare.configure(taskArg.tareConfigBuilder.config());
-                            taskArg.tareConfigBuilder.reset();
-                            taskArg.stateMachine.setState(scale::state::SCALE_STATE_NORMAL);
-                        }
+            scale::adapted::ScaleEvent event = taskArg.adaptedScale.getEvent();
+            
+            switch (taskArg.stateMachine.state()) {
+                case scale::state::SCALE_STATE_NORMAL: {
+                    float taredWeight = taskArg.tare.tare(event.grams);
+                    ESP_LOGI(TAG, "                   %fg", taredWeight);
+                    break;
+                }
+                case scale::state::SCALE_STATE_TARE: {
+                    ESP_LOGI(TAG, "Pushing value into tare");
+                    taskArg.tareConfigBuilder.push(event.grams);
+                    if (taskArg.tareConfigBuilder.isTareReady()) {
+                        ESP_LOGI(TAG, "Tare ready");
+                        taskArg.tare.configure(taskArg.tareConfigBuilder.config());
+                        taskArg.tareConfigBuilder.reset();
+                        taskArg.stateMachine.setState(scale::state::SCALE_STATE_NORMAL);
                     }
                 }
             }

@@ -1,4 +1,4 @@
-#include "weight_sensor.h"
+#include "raw_scale.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -42,10 +42,16 @@ namespace scale::raw {
             ScaleEvent event = {
                 .rawData = data,
             };
-            xQueueSend(_this->queue(), &event, portMAX_DELAY);
+            xQueueSend(_this->_scaleEventQueue, &event, portMAX_DELAY);
             // ESP_LOGI(_this->tag().c_str(), "Raw data: %d", data);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(100));
         }
+    }
+
+    ScaleEvent Scale::getEvent() {
+        ScaleEvent evt;
+        xQueueReceive(_scaleEventQueue, &evt, portMAX_DELAY);
+        return evt;
     }
 
     std::string Scale::tag() const {

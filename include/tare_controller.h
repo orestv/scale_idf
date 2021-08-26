@@ -2,9 +2,11 @@
 
 #include <vector>
 
+#include "tare_persistence.h"
+
 namespace scale::tare {
     struct TareConfig {
-        float tareGrams = 0;
+        float tareGrams;
     };
 
     class TareConfigBuilder {
@@ -21,15 +23,26 @@ namespace scale::tare {
 
     class Tare {
     public:
-        Tare(const TareConfig &config): _config(config) {}
+        Tare(persistence::TarePersistence &persistence): _persistence(persistence) {
+            persistence::TareSaveData saveData = _persistence.load();
+            TareConfig tareConfig = {
+                .tareGrams=saveData.tareGrams,
+            };
+            _config = tareConfig; 
+        }
     
-        void configure(const TareConfig &config) {
+        void update(const TareConfig &config) {
             _config = config;
+            persistence::TareSaveData saveData = {
+                .tareGrams = config.tareGrams,
+            };
+            _persistence.save(saveData);
         }
         float tare(float grams) {
             return grams - _config.tareGrams;
         }
     private:
         TareConfig _config;
+        persistence::TarePersistence &_persistence;
     };
 }

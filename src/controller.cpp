@@ -43,7 +43,7 @@ namespace scale::controller {
             if (!_tareConfigBuilder.isTareReady()) {
                 return;
             }
-            _tare.configure(_tareConfigBuilder.config());
+            _tare.update(_tareConfigBuilder.config());
             _tareConfigBuilder.reset();
             _taring = false;
         }

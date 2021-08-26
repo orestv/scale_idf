@@ -31,6 +31,7 @@
 #include "stabilizer.h"
 #include "stabilized_scale.h"
 #include "adapted_scale.h"
+#include "tare_persistence.h"
 #include "tare_controller.h"
 
 #include "controller.h"
@@ -105,10 +106,11 @@ void app_main(void)
     
     scale::adapted::AdaptedScale adaptedScale(rawScale, converter);
     scale::stabilized::StabilizedScale stabilizedScale(adaptedScale, stabilizer);
+
+    scale::persistence::TarePersistence tarePersistence;
     
-    scale::tare::TareConfig defaultTareConfig;
     scale::tare::TareConfigBuilder tareConfigBuilder;
-    scale::tare::Tare tare(defaultTareConfig);
+    scale::tare::Tare tare(tarePersistence);
 
 
     stabilizedScale.start();

@@ -20,13 +20,19 @@ namespace scale::stabilized {
     void StabilizedScale::processEvent(const adapted::ScaleEvent &incomingEvent) {
         _stabilizer.push(incomingEvent.grams);
         if (!_stabilizer.isStable()) {
-            // todo: send unstable scale event
+            ScaleEvent outgoingEvent = {
+                .eventType=EVENT_UNSTABLE,
+                .grams=0,
+                .gramsRaw=incomingEvent.grams,
+            };
+            xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
             return;
         }
         float stabilizedValue = _stabilizer.getValue();
         ScaleEvent outgoingEvent = {
-            .eventType=EVENT_WEIGHT,
+            .eventType=EVENT_STABLE_WEIGHT,
             .grams=stabilizedValue,
+            .gramsRaw=incomingEvent.grams,
         };
         xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
     }

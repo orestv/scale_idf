@@ -6,6 +6,7 @@
 namespace scale::stabilized {
 
     void Stabilizer::push(float value) {
+        _lastValue = value;
         if (!_isNewValueStable(value)) {
             _loseStability();
             return;
@@ -26,7 +27,7 @@ namespace scale::stabilized {
     }
 
     float Stabilizer::_currentAverage() const {
-        if (_values.size() == 0) return 0;
+        if (_values.size() == 0) return _lastValue;
 
         float sum = std::accumulate(_values.begin(), _values.end(), 0.0);
         return sum / _values.size();

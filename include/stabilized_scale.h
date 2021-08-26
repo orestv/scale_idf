@@ -8,13 +8,14 @@
 
 namespace scale::stabilized {
     enum EventType {
-        EVENT_WEIGHT,
+        EVENT_STABLE_WEIGHT,
         EVENT_UNSTABLE,
     };
 
     struct ScaleEvent {
         EventType eventType;
         float grams;
+        float gramsRaw;
     };
 
     class StabilizedScale {

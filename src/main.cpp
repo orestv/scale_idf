@@ -76,7 +76,7 @@ void app_main(void)
         .gpio_blue = GPIO_RGB_BLUE,
     };
     scale::led::LED led(ledPins);
-    scale::color::ColorReport color(led);
+    scale::color::ColorReport colorReport(led);
     scale::peri::button::PushButton buttonTare(
         {
             .buttonGPIO = GPIO_BUTTON_TARE,
@@ -123,6 +123,7 @@ void app_main(void)
         .stateMachine = stateMachine,
         .tare = tare,
         .tareConfigBuilder = tareConfigBuilder,
+        .colorReport = colorReport,
     };
 
     stabilizedScale.start();

@@ -21,6 +21,7 @@ namespace scale::stabilized {
         bool _isNewValueStable(float newValue) const;
         void _loseStability();
 
+        float _lastValue = 0;
         int _currentIndex = 0;
 
         std::deque<float> _values;

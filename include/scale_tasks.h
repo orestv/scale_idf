@@ -10,6 +10,7 @@
 #include "scale_button.h"
 #include "state_machine.h"
 #include "stabilized_scale.h"
+#include "color_report.h"
 
 namespace scale::tasks {
 
@@ -24,6 +25,7 @@ namespace scale::tasks {
         scale::state::StateMachine &stateMachine;
         scale::tare::Tare &tare;
         scale::tare::TareConfigBuilder &tareConfigBuilder;
+        scale::color::ColorReport &colorReport;
     };
 
     void taskTareButton(void *arg) {
@@ -49,8 +51,14 @@ namespace scale::tasks {
             
             switch (taskArg.stateMachine.state()) {
                 case scale::state::SCALE_STATE_NORMAL: {
-                    float taredWeight = taskArg.tare.tare(event.grams);
-                    ESP_LOGI(TAG, "                   %fg", taredWeight);
+                    
+                    if (event.eventType == scale::stabilized::EVENT_STABLE_WEIGHT) {
+                        float taredWeight = taskArg.tare.tare(event.grams);
+                        ESP_LOGI(TAG, "                   %fg", taredWeight);
+                    }
+
+                    float taredRawWeight = taskArg.tare.tare(event.gramsRaw);
+                    taskArg.colorReport.onWeightChanged(taredRawWeight);
                     break;
                 }
                 case scale::state::SCALE_STATE_TARE: {

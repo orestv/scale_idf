@@ -32,9 +32,7 @@ namespace scale::peri::button {
             start();
         }
 
-        xQueueHandle queue() const {
-            return _buttonEventQueue;
-        }
+        ButtonEvent getEvent();
 
     private:
         static void IRAM_ATTR gpio_isr_handler(void* arg);

@@ -34,12 +34,10 @@ namespace scale::tasks {
         ESP_LOGI("TaskTareButton", "Starting task");
 
         while (true) {
-            scale::peri::button::ButtonEvent evt;
-            if (xQueueReceive(taskArg.button.queue(), &evt, portMAX_DELAY)) {
-                ESP_LOGI("TaskTareButton", "Received button event");
-                taskArg.stateMachine.setState(scale::state::SCALE_STATE_TARE);
-                taskArg.tareConfigBuilder.reset();
-            }
+            scale::peri::button::ButtonEvent evt = taskArg.button.getEvent();
+            ESP_LOGI("TaskTareButton", "Received button event");
+            taskArg.stateMachine.setState(scale::state::SCALE_STATE_TARE);
+            taskArg.tareConfigBuilder.reset();
         }
     }
 

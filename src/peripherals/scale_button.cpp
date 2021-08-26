@@ -28,6 +28,12 @@ namespace scale::peri::button {
         ESP_LOGI(tag().c_str(), "ISR Handler installed");
     }
 
+    ButtonEvent PushButton::getEvent() {
+        ButtonEvent evt;
+        xQueueReceive(_buttonEventQueue, &evt, portMAX_DELAY);
+        return evt;
+    }
+
     std::string PushButton::tag() const {
         std::ostringstream oss;
         oss << "Button_" << _config.buttonGPIO;

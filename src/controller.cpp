@@ -49,7 +49,7 @@ namespace scale::controller {
         }
 
         float taredGrams = _tare.tare(event.grams);
-        ESP_LOGI(TAG, "                  %fg", taredGrams);
+        ESP_LOGI(TAG, "                  %.1fg", taredGrams);
     }
 
     void ScaleController::onTareButtonPressed() {

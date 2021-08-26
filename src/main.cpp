@@ -33,8 +33,7 @@
 #include "adapted_scale.h"
 #include "tare_controller.h"
 
-#include "scale_tasks.h"
-#include "state_machine.h"
+#include "controller.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
 
@@ -111,25 +110,19 @@ void app_main(void)
     scale::tare::TareConfigBuilder tareConfigBuilder;
     scale::tare::Tare tare(defaultTareConfig);
 
-    scale::state::StateMachine stateMachine;
-
-    scale::tasks::TaskArgTareButton taskArgsTareButton = {
-        .stateMachine = stateMachine,
-        .button = buttonTare,
-        .tareConfigBuilder = tareConfigBuilder,
-    };
-    scale::tasks::TaskArgReportWeight taskArgsReportWeight = {
-        .stabilizedScale = stabilizedScale,
-        .stateMachine = stateMachine,
-        .tare = tare,
-        .tareConfigBuilder = tareConfigBuilder,
-        .colorReport = colorReport,
-    };
 
     stabilizedScale.start();
 
-    scale::tasks::startTaskTareButton(taskArgsTareButton);
-    scale::tasks::startTaskReportWeight(taskArgsReportWeight);
+    scale::controller::ScaleControllerArgs args = {
+        .buttonTare = buttonTare,
+        .colorReport = colorReport,
+        .stabilizedScale = stabilizedScale,
+        .tare=tare,
+        .tareConfigBuilder=tareConfigBuilder,
+    };
+    scale::controller::ScaleController controller(args);
+    
+    controller.start();
 
     while (true) {
         vTaskDelay(portMAX_DELAY);

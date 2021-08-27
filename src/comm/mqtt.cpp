@@ -13,14 +13,51 @@ namespace scale::mqtt {
         }
     }
 
-    static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
+    MQTTClient::MQTTClient(const MQTTConfig &config, const MQTTSubscriptionConfig &subscriptions) : 
+            _config(config), 
+            _subscriptions(subscriptions),
+            _isConnected(false)
+    {
+        esp_mqtt_client_config_t mqtt_cfg = {
+            .uri = _config.brokerUrl.c_str(),
+        };
+        _espMqttClient = esp_mqtt_client_init(&mqtt_cfg);
+        esp_mqtt_client_register_event(
+            _espMqttClient,
+            (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID,
+            [](void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+            {
+                MQTTClient &_this = *(MQTTClient*)handler_args;
+                _this.mqttEventHandler(base, event_id, event_data);
+            },
+            this);
+        esp_mqtt_client_start(_espMqttClient);
+    }
+
+    bool MQTTClient::isConnected() const {
+        return _isConnected;
+    }
+
+    void MQTTClient::send(OutgoingMQTTMessage message) {
+        ESP_LOGI(TAG, "Sending MQTT message to %s: %s", message.topic.c_str(), message.message.c_str());
+        esp_mqtt_client_publish(
+            _espMqttClient,
+            message.topic.c_str(),
+            message.message.c_str(),
+            0, message.qos, 0
+        );
+    }
+
+    void MQTTClient::mqttEventHandler(esp_event_base_t base, int32_t event_id, void *event_data) {
         ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
         esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t)event_data;
         esp_mqtt_client_handle_t client = event->client;
         int msg_id;
-        switch ((esp_mqtt_event_id_t)event_id) {
+        switch ((esp_mqtt_event_id_t)event_id)
+        {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
+            _isConnected = true;
             // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
             // ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
 
@@ -34,6 +71,7 @@ namespace scale::mqtt {
             // ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
             break;
         case MQTT_EVENT_DISCONNECTED:
+            _isConnected = false;
             ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
             break;
 
@@ -55,27 +93,17 @@ namespace scale::mqtt {
             break;
         case MQTT_EVENT_ERROR:
             ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
-            if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT) {
+            if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT)
+            {
                 log_error_if_nonzero("reported from esp-tls", event->error_handle->esp_tls_last_esp_err);
                 log_error_if_nonzero("reported from tls stack", event->error_handle->esp_tls_stack_err);
-                log_error_if_nonzero("captured as transport's socket errno",  event->error_handle->esp_transport_sock_errno);
+                log_error_if_nonzero("captured as transport's socket errno", event->error_handle->esp_transport_sock_errno);
                 ESP_LOGI(TAG, "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
-
             }
             break;
         default:
             ESP_LOGI(TAG, "Other event id:%d", event->event_id);
             break;
         }
-    }
-
-    MQTTClient::MQTTClient(const MQTTConfig &config, const MQTTSubscriptionConfig &subscriptions) : _config(config), _subscriptions(subscriptions)
-    {
-        esp_mqtt_client_config_t mqtt_cfg = {
-            .uri = _config.brokerUrl.c_str(),
-        };
-        esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-        esp_mqtt_client_register_event(client, (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
-        esp_mqtt_client_start(client);
     }
 }

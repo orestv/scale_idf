@@ -141,6 +141,7 @@ void app_main(void)
         .stabilizedScale = stabilizedScale,
         .tare=tare,
         .tareConfigBuilder=tareConfigBuilder,
+        .mqttClient=mqttClient,
     };
     scale::controller::ScaleController controller(args);
     

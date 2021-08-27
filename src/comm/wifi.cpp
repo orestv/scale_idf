@@ -120,16 +120,27 @@ namespace scale::wifi {
             ESP_LOGE(TAG, "Failed to get hostname: %d", err_set_hostname);
         }
 
-        EventBits_t bits = xEventGroupWaitBits(
-            this->_wifiEventGroup,
-            WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
-            pdFALSE,
-            pdFALSE,
-            portMAX_DELAY
-        );
+        // xTaskCreate(
+        //     [](void *arg) {
+        //         WifiClient &_this = *(WifiClient*)arg;
+        //         _this.taskEventNotify();
+        //     }, "WaitWifiEvents", 2048, this, 10, nullptr
+        // );
+    }
 
-        if (bits & WIFI_CONNECTED_BIT) {
-            ESP_LOGI(TAG, "CONNECTED TO WIFI");
+    void WifiClient::taskEventNotify() {
+        while (true) {
+            EventBits_t bits = xEventGroupWaitBits(
+                this->_wifiEventGroup,
+                WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
+                pdFALSE,
+                pdFALSE,
+                portMAX_DELAY);
+
+            if (bits & WIFI_CONNECTED_BIT)
+            {
+                ESP_LOGI(TAG, "CONNECTED TO WIFI");
+            }
         }
     }
 }

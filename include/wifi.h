@@ -38,6 +38,8 @@ namespace scale::wifi {
         static void static_wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
         void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
+        void taskEventNotify();
+
         WifiConfig _wifiConfig;
         EventGroupHandle_t _wifiEventGroup;
     };

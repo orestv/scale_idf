@@ -34,9 +34,15 @@
 #include "tare_persistence.h"
 #include "tare_controller.h"
 
+#include "wifi.h"
+
 #include "controller.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
+
+const std::string AP_HOSTNAME = "feeder";
+const std::string AP_SSID = "Rift2.4";
+const std::string AP_WPA2_PWD = "breakdown";
 
 const gpio_num_t GPIO_RGB_RED = GPIO_NUM_32;
 const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_25;
@@ -112,6 +118,13 @@ void app_main(void)
     scale::tare::TareConfigBuilder tareConfigBuilder;
     scale::tare::Tare tare(tarePersistence);
 
+    scale::wifi::WifiClient wifiClient({.hostname=AP_HOSTNAME});
+    wifiClient.start(
+        {
+            .ssid=AP_SSID,
+            .wpa2Password=AP_WPA2_PWD,
+        }, 1
+    );
 
     stabilizedScale.start();
 

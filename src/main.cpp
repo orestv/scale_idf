@@ -35,6 +35,7 @@
 #include "tare_controller.h"
 
 #include "wifi.h"
+#include "mqtt.h"
 
 #include "controller.h"
 
@@ -43,6 +44,8 @@
 const std::string AP_HOSTNAME = "feeder";
 const std::string AP_SSID = "Rift2.4";
 const std::string AP_WPA2_PWD = "breakdown";
+
+const std::string MQTT_BROKER_URL = "mqtt://openhab";
 
 const gpio_num_t GPIO_RGB_RED = GPIO_NUM_32;
 const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_25;
@@ -124,6 +127,10 @@ void app_main(void)
             .ssid=AP_SSID,
             .wpa2Password=AP_WPA2_PWD,
         }, 1
+    );
+
+    scale::mqtt::MQTTClient mqttClient(
+        {.brokerUrl=MQTT_BROKER_URL}, {}
     );
 
     stabilizedScale.start();

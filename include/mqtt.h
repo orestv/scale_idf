@@ -1,10 +1,20 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace scale::mqtt {
-    struct MQTTParams {
+    struct MQTTConfig {
         std::string brokerUrl;
+    };
+
+    struct MQTTSubscription {
+        std::string topic;
+        int qos;
+    };
+
+    struct MQTTSubscriptionConfig {
+        std::vector<MQTTSubscription> subscriptions;
     };
 
     struct IncomingMQTTMessage {
@@ -15,10 +25,11 @@ namespace scale::mqtt {
 
     class MQTTClient {
         public:
-            MQTTClient();
+            MQTTClient(const MQTTConfig &config, const MQTTSubscriptionConfig &subscriptions);
 
             IncomingMQTTMessage getNextMessage(int timeoutMS);
         private:
-
+            MQTTConfig _config;
+            MQTTSubscriptionConfig _subscriptions;
     };
 }

@@ -29,6 +29,17 @@ namespace scale::controller {
             },
             "TareButton", 2048, this, 10, nullptr
         );
+
+        xTaskCreate(
+            [](void *arg) {
+                ScaleController &_this = *(ScaleController*)arg;
+                while (true) {
+                    peri::button::ButtonEvent evt = _this._buttonMaintenance.getEvent();
+                    _this.onMaintenanceButtonPressed();
+                }
+            },
+            "MaintenanceButton", 2048, this, 10, nullptr
+        );
     }
 
     void ScaleController::processScaleEvent(const stabilized::ScaleEvent &event) {
@@ -53,12 +64,22 @@ namespace scale::controller {
 
         float taredGrams = _tare.tare(event.grams);
         ESP_LOGI(TAG, "                  %.1fg", taredGrams);
-        _mqttReport.reportWeight(taredGrams);        
+        if (!_maintenance.isMaintenanceModeOn()) {
+            _mqttReport.reportWeight(taredGrams);        
+        } else {
+            ESP_LOGI(TAG, "Maintenance mode on: not reporting weight");
+        }
     }
 
     void ScaleController::onTareButtonPressed() {
         ESP_LOGI(TAG, "Taring.");
         _taring = true;
         _tareConfigBuilder.reset();
-    } 
+    }
+
+    void ScaleController::onMaintenanceButtonPressed() {
+        ESP_LOGI(TAG, "Toggling maintenance mode");
+        _maintenance.toggleMaintenanceMode();
+        ESP_LOGI(TAG, "Maintenance mode is now %s", _maintenance.isMaintenanceModeOn() ? "on" : "off");
+    }
 }

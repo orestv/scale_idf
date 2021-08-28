@@ -38,6 +38,8 @@
 #include "mqtt.h"
 #include "mqtt_report.h"
 
+#include "maintenance.h"
+
 #include "controller.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
@@ -95,9 +97,7 @@ void app_main(void)
         }
     );
     scale::peri::button::PushButton buttonMaintenance(
-        {
-            .buttonGPIO = GPIO_BUTTON_MAINTENANCE,
-        }
+        {.buttonGPIO = GPIO_BUTTON_MAINTENANCE,}
     );
 
     scale::raw::Scale rawScale(
@@ -147,8 +147,12 @@ void app_main(void)
 
     stabilizedScale.start();
 
+    scale::maintenance::Maintenance maintenance;
+
     scale::controller::ScaleControllerArgs args = {
         .buttonTare = buttonTare,
+        .buttonMaintenance = buttonMaintenance,
+        .maintenance = maintenance,
         .colorReport = colorReport,
         .stabilizedScale = stabilizedScale,
         .tare=tare,

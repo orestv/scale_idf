@@ -10,12 +10,11 @@
 #include "nvs.h"
 
 namespace scale::persistence {
-    const char *NAMESPACE = "storage";
-
-    const char *TAG2 = "PersistenceUtil";
     
     template <typename T>
     esp_err_t save(const T &data, const std::string tag) {
+        const char *NAMESPACE = "storage";
+        const char *TAG2 = "PersistenceUtil";
         ESP_LOGI(TAG2, "Persisting data");
         nvs_handle_t nvs_handle;
         esp_err_t err;
@@ -39,6 +38,8 @@ namespace scale::persistence {
 
     template <typename T>
     esp_err_t load(T &data, const std::string tag) {
+        const char *NAMESPACE = "storage";
+        const char *TAG2 = "PersistenceUtil";
         ESP_LOGI(TAG2, "Loading data");
         nvs_handle_t nvs_handle;
         esp_err_t err;

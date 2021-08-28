@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace scale::persistence {
     struct TareSaveData {
         float tareGrams;
@@ -9,5 +11,7 @@ namespace scale::persistence {
     public:
         void save(const TareSaveData &data);
         TareSaveData load();
+
+        std::string _nvsTag = "tare";
     };
 }

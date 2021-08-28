@@ -4,7 +4,7 @@
 #include "stabilized_scale.h"
 #include "tare_controller.h"
 #include "color_report.h"
-#include "mqtt.h"
+#include "mqtt_report.h"
 
 namespace scale::controller {
     struct ScaleControllerArgs {
@@ -13,23 +13,7 @@ namespace scale::controller {
         stabilized::StabilizedScale &stabilizedScale;
         tare::Tare &tare;
         tare::TareConfigBuilder &tareConfigBuilder;
-        mqtt::MQTTClient &mqttClient;
-    };
-
-    class MQTTReportDebouncer {
-    public:
-        MQTTReportDebouncer(uint periodMS);
-        bool shouldPublish(const mqtt::OutgoingMQTTMessage &msg) const;
-        void published(const mqtt::OutgoingMQTTMessage &msg);
-        void clear();
-    private:
-        uint now() const;
-
-        uint _periodMS;
-
-        mqtt::OutgoingMQTTMessage _storedMessage;
-        bool _published;
-        int _lastPublishTime;
+        mqtt::MQTTReport &mqttReport;
     };
 
     class ScaleController {
@@ -40,8 +24,7 @@ namespace scale::controller {
                 _stabilizedScale(args.stabilizedScale),
                 _tare(args.tare),
                 _tareConfigBuilder(args.tareConfigBuilder),
-                _mqttClient(args.mqttClient),
-                _reportDebouncer(1000U) {
+                _mqttReport(args.mqttReport) {
 
         }
 
@@ -57,8 +40,6 @@ namespace scale::controller {
         stabilized::StabilizedScale &_stabilizedScale;
         tare::Tare &_tare;
         tare::TareConfigBuilder &_tareConfigBuilder;
-        mqtt::MQTTClient &_mqttClient;
-
-        MQTTReportDebouncer _reportDebouncer;
+        mqtt::MQTTReport &_mqttReport;
     };
 }

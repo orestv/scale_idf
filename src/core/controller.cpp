@@ -36,7 +36,7 @@ namespace scale::controller {
         _colorReport.onWeightChanged(taredGramsRaw);
 
         if (event.eventType != stabilized::EVENT_STABLE_WEIGHT) {
-            _reportDebouncer.clear();
+            _mqttReport.reportStable(false);
             return;
         }
 
@@ -49,56 +49,16 @@ namespace scale::controller {
             _tare.update(_tareConfigBuilder.config());
             _tareConfigBuilder.reset();
             _taring = false;
-            _reportDebouncer.clear();
         }
 
         float taredGrams = _tare.tare(event.grams);
         ESP_LOGI(TAG, "                  %.1fg", taredGrams);
-        if (_mqttClient.isConnected()) {
-            std::ostringstream oss;
-            oss << taredGrams;
-            ESP_LOGI(TAG, "Will send %s to %s", oss.str().c_str(), "/feeder/weight");
-            mqtt::OutgoingMQTTMessage msg = {
-                .topic="/feeder/weight",
-                .message=oss.str(),
-                .qos=1,
-            };
-            if (_reportDebouncer.shouldPublish(msg)) {
-                _mqttClient.send(msg);
-                _reportDebouncer.published(msg);
-            }
-        }
+        _mqttReport.reportWeight(taredGrams);        
     }
 
     void ScaleController::onTareButtonPressed() {
         ESP_LOGI(TAG, "Taring.");
         _taring = true;
         _tareConfigBuilder.reset();
-    }
-
-    MQTTReportDebouncer::MQTTReportDebouncer(uint periodMS): _periodMS(periodMS), _published(false) {
-
-    }
-
-    bool MQTTReportDebouncer::shouldPublish(const mqtt::OutgoingMQTTMessage &msg) const {
-        if (!_published) return true;
-        if (msg != _storedMessage) return true;
-        if (now() - _lastPublishTime > _periodMS) return true;
-        return false;
-    }
-
-    void MQTTReportDebouncer::published(const mqtt::OutgoingMQTTMessage &msg) {
-        _lastPublishTime = now();
-        _published = true;
-        _storedMessage = msg;
-    }
-
-    void MQTTReportDebouncer::clear() {
-        _published = false;
-        _lastPublishTime = 0;
-    }
-
-    uint MQTTReportDebouncer::now() const {
-        return esp_timer_get_time() / 1000;
-    }
+    } 
 }

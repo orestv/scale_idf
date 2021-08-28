@@ -36,6 +36,7 @@
 
 #include "wifi.h"
 #include "mqtt.h"
+#include "mqtt_report.h"
 
 #include "controller.h"
 
@@ -46,6 +47,8 @@ const std::string AP_SSID = "Rift2.4";
 const std::string AP_WPA2_PWD = "breakdown";
 
 const std::string MQTT_BROKER_URL = "mqtt://openhab";
+const std::string MQTT_TOPIC_WEIGHT = "/feeder/weight";
+const std::string MQTT_TOPIC_STABLE = "/feeder/stable";
 
 const gpio_num_t GPIO_RGB_RED = GPIO_NUM_32;
 const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_25;
@@ -133,6 +136,15 @@ void app_main(void)
         {.brokerUrl=MQTT_BROKER_URL}, {}
     );
 
+    scale::mqtt::MQTTReportConfig reportConfig = {
+        .topics = {
+            .topicWeight=MQTT_TOPIC_WEIGHT,
+            .topicStable=MQTT_TOPIC_STABLE,
+        },
+        .mqttClient=mqttClient,
+    };
+    scale::mqtt::MQTTReport mqttReport(reportConfig);
+
     stabilizedScale.start();
 
     scale::controller::ScaleControllerArgs args = {
@@ -141,7 +153,7 @@ void app_main(void)
         .stabilizedScale = stabilizedScale,
         .tare=tare,
         .tareConfigBuilder=tareConfigBuilder,
-        .mqttClient=mqttClient,
+        .mqttReport=mqttReport,
     };
     scale::controller::ScaleController controller(args);
     

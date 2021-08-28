@@ -64,6 +64,8 @@ namespace scale::controller {
 
         float taredGrams = _tare.tare(event.grams);
         ESP_LOGI(TAG, "                  %.1fg", taredGrams);
+
+        _lcd.setWeight(taredGrams);
         if (!_maintenance.isMaintenanceModeOn()) {
             _mqttReport.reportWeight(taredGrams);        
         } else {

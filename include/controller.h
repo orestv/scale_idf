@@ -6,6 +6,7 @@
 #include "color_report.h"
 #include "mqtt_report.h"
 #include "maintenance.h"
+#include "scale_lcd.h"
 
 namespace scale::controller {
     struct ScaleControllerArgs {
@@ -17,6 +18,7 @@ namespace scale::controller {
         tare::Tare &tare;
         tare::TareConfigBuilder &tareConfigBuilder;
         mqtt::MQTTReport &mqttReport;
+        lcd::LCD &lcd;
     };
 
     class ScaleController {
@@ -29,7 +31,8 @@ namespace scale::controller {
                 _stabilizedScale(args.stabilizedScale),
                 _tare(args.tare),
                 _tareConfigBuilder(args.tareConfigBuilder),
-                _mqttReport(args.mqttReport) {
+                _mqttReport(args.mqttReport),
+                _lcd(args.lcd) {
 
         }
 
@@ -49,5 +52,6 @@ namespace scale::controller {
         tare::Tare &_tare;
         tare::TareConfigBuilder &_tareConfigBuilder;
         mqtt::MQTTReport &_mqttReport;
+        lcd::LCD &_lcd;
     };
 }

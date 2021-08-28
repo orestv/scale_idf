@@ -42,6 +42,8 @@
 
 #include "controller.h"
 
+#include "scale_lcd.h"
+
 #define ESP_INTR_FLAG_DEFAULT 0
 
 const std::string AP_HOSTNAME = "feeder";
@@ -61,6 +63,9 @@ const gpio_num_t GPIO_BUTTON_MAINTENANCE = GPIO_NUM_15;
 
 const gpio_num_t GPIO_HX711_CLK = GPIO_NUM_21;
 const gpio_num_t GPIO_HX711_DAT = GPIO_NUM_22;
+
+const gpio_num_t GPIO_LCD_SDA = GPIO_NUM_17;
+const gpio_num_t GPIO_LCD_SCL = GPIO_NUM_18;
 
 extern "C" {
     void app_main(void);
@@ -147,6 +152,13 @@ void app_main(void)
 
     stabilizedScale.start();
 
+    scale::lcd::LCDConfig lcdConfig = {
+        .gpioSDA = GPIO_LCD_SDA,
+        .gpioSCL = GPIO_LCD_SCL,
+    };
+    scale::lcd::LCD lcd(lcdConfig);
+    lcd.start();
+
     scale::maintenance::Maintenance maintenance;
 
     scale::controller::ScaleControllerArgs args = {
@@ -158,6 +170,7 @@ void app_main(void)
         .tare=tare,
         .tareConfigBuilder=tareConfigBuilder,
         .mqttReport=mqttReport,
+        .lcd=lcd,
     };
     scale::controller::ScaleController controller(args);
     

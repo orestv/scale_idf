@@ -11,21 +11,18 @@ namespace scale::mqtt {
         if (error_code != 0) {
             ESP_LOGE(TAG, "Last error %s: 0x%x", message, error_code);
         }
-    }
+    }\
 
-    MQTTClient::MQTTClient(const MQTTConfig &config, const MQTTSubscriptionConfig &subscriptions) : 
-            _config(config), 
-            _subscriptions(subscriptions),
-            _isConnected(false)
-    {
-        
-    }
-
-    void MQTTClient::start() {
+    MQTTClient::MQTTClient(const MQTTConfig &config, const MQTTSubscriptionConfig &subscriptions) : _config(config),
+                                                                                                    _subscriptions(subscriptions),
+                                                                                                    _isConnected(false) {
         esp_mqtt_client_config_t mqtt_cfg = {
             .uri = _config.brokerUrl.c_str(),
         };
         _espMqttClient = esp_mqtt_client_init(&mqtt_cfg);
+    }
+
+    void MQTTClient::start() {
         esp_mqtt_client_register_event(
             _espMqttClient,
             (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID,
@@ -35,7 +32,22 @@ namespace scale::mqtt {
                 _this.mqttEventHandler(base, event_id, event_data);
             },
             this);
-        esp_mqtt_client_start(_espMqttClient);
+        // esp_mqtt_client_start(_espMqttClient);
+        esp_event_handler_register_with(
+            _config.eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_WIFI_CONNECTION_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                auto &_this = *(MQTTClient*)arg;
+                auto &evt = *(events::EventWifiConnectionChanged*)event_data;
+                if (evt.connected) {
+                    esp_mqtt_client_start(_this._espMqttClient);
+                } else {
+                    esp_mqtt_client_stop(_this._espMqttClient);
+                }
+            }, 
+            this
+        );
     }
 
     bool MQTTClient::isConnected() const {

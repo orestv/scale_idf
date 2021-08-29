@@ -65,7 +65,7 @@ namespace scale::lcd {
     }
 
     void LCD::renderMaintenance() {
-        const char *sMaintenance = _state.maintenance ? "MAINTEANCE" : "           ";
+        const char *sMaintenance = _state.maintenance ? "MAINTENANCE" : "           ";
         i2c_lcd1602_move_cursor(_lcdInfo, 0, 0);
         i2c_lcd1602_write_string(_lcdInfo, sMaintenance);
     }

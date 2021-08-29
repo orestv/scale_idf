@@ -27,20 +27,25 @@ namespace scale::peri::button {
                 auto &_this = *(PushButton*)arg;
                 while (true) {
                     xQueueReceive(_this._q, nullptr, portMAX_DELAY);
-                    ESP_LOGI(_this.tag().c_str(), "Button receive q event");
+                    ESP_LOGD(_this.tag().c_str(), "Button receive q event");
                     auto level = gpio_get_level(_this._config.buttonGPIO);
+                    ESP_LOGD(_this.tag().c_str(), "Button level: %i", level);
                     if (level == 1) {
+                        ESP_LOGD(_this.tag().c_str(), "Checking debouncer");
                         if (!_this._debouncer.trigger()) {
-                            return;
+                            ESP_LOGD(_this.tag().c_str(), "Debouncer rejected button click, aborting");
+                            continue;
                         }
+                        ESP_LOGD(_this.tag().c_str(), "Posting event");
                         esp_event_post_to(
                             _this._config.eventLoop,
                             events::SCALE_EVENT,
                             _this._config.eventID,
                             nullptr,
                             0,
-                            0
+                            portMAX_DELAY
                         );
+                        ESP_LOGD(_this.tag().c_str(), "Event posted");
                     }
                 }
             },
@@ -61,6 +66,6 @@ namespace scale::peri::button {
 
     void IRAM_ATTR PushButton::gpio_isr_handler(void* arg) {
         auto &_this = *(PushButton*)arg;
-        xQueueSend(_this._q, nullptr, 0);
+        xQueueSendFromISR(_this._q, nullptr, 0);
     }
 }

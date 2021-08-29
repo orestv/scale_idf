@@ -66,7 +66,7 @@ namespace scale::wifi {
 
         auto& _this = *(WifiClient*)arg;
 
-        ESP_LOGI(TAG, "Got Wifi event");
+        ESP_LOGI(TAG, "Got Wifi event %i", event_id);
 
         if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
             esp_wifi_connect();

@@ -167,7 +167,8 @@ void app_main(void)
     };
     scale::lcd::LCD lcd(lcdConfig);
     lcd.start();
-
+    lcd.waitUntilReady();
+    
     scale::maintenance::Maintenance maintenance(scaleEventLoop);
 
     scale::mqtt::MQTTReportConfig reportConfig = {

@@ -4,8 +4,7 @@ namespace scale::lcd {
 MQTTWidget::MQTTWidget(
     i2c_lcd1602_info_t *lcdInfo,
     esp_event_loop_handle_t eventLoop)
-    : _lcdInfo(lcdInfo),
-      _eventLoop(eventLoop) {
+    : BaseWidget(lcdInfo, eventLoop) {
     esp_event_handler_register_with(
         eventLoop,
         events::SCALE_EVENT,
@@ -20,10 +19,10 @@ MQTTWidget::MQTTWidget(
 }
 
 void MQTTWidget::render() {
-    i2c_lcd1602_move_cursor(_lcdInfo, 15, 1);
-    i2c_lcd1602_write_string(_lcdInfo, "MQTT");
-    i2c_lcd1602_move_cursor(_lcdInfo, 19, 1);
-    i2c_lcd1602_write_char(_lcdInfo, _mqttConnected ? '+' : '-');
+    i2c_lcd1602_move_cursor(lcdInfo(), 15, 1);
+    i2c_lcd1602_write_string(lcdInfo(), "MQTT");
+    i2c_lcd1602_move_cursor(lcdInfo(), 19, 1);
+    i2c_lcd1602_write_char(lcdInfo(), _mqttConnected ? '+' : '-');
 }
 
 }  // namespace scale::lcd

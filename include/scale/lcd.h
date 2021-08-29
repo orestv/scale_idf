@@ -39,8 +39,6 @@ namespace scale::lcd {
     };
 
     struct LCDState {
-        float grams;
-        bool maintenance;
     };
 
     class LCD {
@@ -48,8 +46,7 @@ namespace scale::lcd {
         LCD(const LCDConfig &config);
 
         void start();
-        void setWeight(float grams);
-        void setMaintenance(bool maintenance);
+        void waitUntilReady();
     private:
 
         void init();
@@ -59,12 +56,9 @@ namespace scale::lcd {
         void requestRedraw();
 
         void render();
-        void renderWeight();
-        void renderMaintenance();
-
-        void onWeightChanged(const events::EventStabilizedTaredWeightChanged &evt);
 
         xQueueHandle _eventQueue;
+        xQueueHandle _readyQueue;
 
         std::vector<std::unique_ptr<BaseWidget>> _widgets;
 

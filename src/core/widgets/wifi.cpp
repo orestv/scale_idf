@@ -4,8 +4,7 @@ namespace scale::lcd {
 WifiWidget::WifiWidget(
     i2c_lcd1602_info_t *lcdInfo,
     esp_event_loop_handle_t eventLoop)
-    : _lcdInfo(lcdInfo),
-      _eventLoop(eventLoop) {
+    : BaseWidget(lcdInfo, eventLoop) {
           esp_event_handler_register_with(
               eventLoop,
               events::SCALE_EVENT,
@@ -21,11 +20,10 @@ WifiWidget::WifiWidget(
 }
 
 void WifiWidget::render() {
-    i2c_lcd1602_move_cursor(_lcdInfo, 15, 0);
-    i2c_lcd1602_write_string(_lcdInfo, "WiFi");
-    i2c_lcd1602_move_cursor(_lcdInfo, 19, 0);
-    i2c_lcd1602_write_char(_lcdInfo, _wifiConnected ? '+' : '-');
-
+    i2c_lcd1602_move_cursor(lcdInfo(), 15, 0);
+    i2c_lcd1602_write_string(lcdInfo(), "WiFi");
+    i2c_lcd1602_move_cursor(lcdInfo(), 19, 0);
+    i2c_lcd1602_write_char(lcdInfo(), _wifiConnected ? '+' : '-');
 }
 
 }  // namespace scale::lcd

@@ -10,9 +10,8 @@ namespace scale::lcd {
 
     LCD::LCD(const LCDConfig &config): _config(config), _lcdInfo(nullptr) {
         _eventQueue = xQueueCreate(10, sizeof(LCDEvent));
+        _readyQueue = xQueueCreate(1, 0);
         _state = {
-            .grams = 0,
-            .maintenance = false,
         };        
         subscribeToEvents();
     }
@@ -24,13 +23,23 @@ namespace scale::lcd {
                 _this.init();
                 std::unique_ptr<BaseWidget> wifiWidget(new WifiWidget(_this._lcdInfo, _this._config.eventLoop));
                 std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop));
+                std::unique_ptr<BaseWidget> weightWidget(new WeightWidget(_this._lcdInfo, _this._config.eventLoop));
+                std::unique_ptr<BaseWidget> maintenanceWidget(new MaintenanceWidget(_this._lcdInfo, _this._config.eventLoop));
+
                 _this._widgets.push_back(std::move(wifiWidget));
                 _this._widgets.push_back(std::move(mqttWidget));
+                _this._widgets.push_back(std::move(weightWidget));
+                _this._widgets.push_back(std::move(maintenanceWidget));
+                xQueueSend(_this._readyQueue, nullptr, portMAX_DELAY);
                 while (true) {
                     _this.taskLoop();
                 }
             }, "LCD", 8192, this, 10, nullptr
         );
+    }
+    
+    void LCD::waitUntilReady() {
+        xQueueReceive(_readyQueue, nullptr, portMAX_DELAY);
     }
 
     void LCD::taskLoop() {
@@ -42,34 +51,9 @@ namespace scale::lcd {
     }
 
     void LCD::render() {
-        renderWeight();
-        renderMaintenance();
         for (auto &widget : _widgets) {
             widget->render();
         }
-    }
-    void LCD::renderWeight() {
-        std::stringstream oss;
-        oss << "Weight: " << std::fixed << std::setprecision(2) << _state.grams;
-
-        i2c_lcd1602_move_cursor(_lcdInfo, 0, 3);
-        i2c_lcd1602_write_string(_lcdInfo, oss.str().c_str());
-    }
-
-    void LCD::renderMaintenance() {
-        const char *sMaintenance = _state.maintenance ? "MAINTENANCE" : "           ";
-        i2c_lcd1602_move_cursor(_lcdInfo, 0, 0);
-        i2c_lcd1602_write_string(_lcdInfo, sMaintenance);
-    }
-
-    void LCD::setWeight(float grams) {
-        _state.grams = grams;
-        requestRedraw();
-    }
-
-    void LCD::setMaintenance(bool maintenance) {
-        _state.maintenance = maintenance;
-        requestRedraw();
     }
 
     void LCD::requestRedraw() {
@@ -77,32 +61,7 @@ namespace scale::lcd {
         xQueueSend(_eventQueue, &event, portMAX_DELAY);
     }
 
-    void LCD::onWeightChanged(const events::EventStabilizedTaredWeightChanged &evt) {
-        setWeight(evt.grams);
-    }
-
     void LCD::subscribeToEvents() {
-        esp_event_handler_register_with(
-            _config.eventLoop,
-            events::SCALE_EVENT,
-            events::EVENT_STABILIZED_TARED_WEIGHT_CHANGED,
-            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-                LCD &_this = *(LCD*)arg;
-                auto &evt = *(events::EventStabilizedTaredWeightChanged*)event_data;
-                _this.onWeightChanged(evt);
-            }, 
-            this
-        );
-        esp_event_handler_register_with(
-            _config.eventLoop,
-            events::SCALE_EVENT,
-            events::EVENT_MAINTENANCE_MODE_CHANGED,
-            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-                LCD &_this = *(LCD *)arg;
-                auto &evt = *(events::EventMaintenanceModeChanged *)event_data;
-                _this.setMaintenance(evt.isMaintenanceModeOn);
-            },
-            this);
     }
 
     void LCD::init() {

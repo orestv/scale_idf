@@ -27,7 +27,7 @@ namespace scale::stabilized {
     }
 
     void StabilizedScale::processEvent(const events::EventRawWeightChanged &incomingEvent) {
-        ESP_LOGI(TAG, "Received adapted data, stabilizing");
+        ESP_LOGI(TAG, "Received adapted data %f, stabilizing", incomingEvent.grams);
         _stabilizer.push(incomingEvent.grams);
         if (!_stabilizer.isStable()) {
             // todo: send "unstable" event
@@ -38,6 +38,8 @@ namespace scale::stabilized {
         events::EventStabilizedWeightChanged evt = {
             .grams = stabilizedValue,
         };
+
+        ESP_LOGI(TAG, "Sending stabilized value %f", stabilizedValue);
 
         esp_event_post_to(
             _eventLoop,

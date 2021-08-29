@@ -64,7 +64,7 @@ namespace scale::tare {
     }
 
     void Tare::onStabilizedWeightChanged(const events::EventStabilizedWeightChanged &evt) {
-        ESP_LOGI(TAG, "Stabilized weight change event");
+        ESP_LOGI(TAG, "Stabilized weight change event: %f", evt.grams);
         if (_taring) {
             TareConfig tareConfig = {
                 .zeroAtGrams = evt.grams
@@ -72,6 +72,7 @@ namespace scale::tare {
             this->update(tareConfig);
         }
         float taredGrams = this->tare(evt.grams);
+        ESP_LOGI(TAG, "Tared grams: %f", taredGrams);
         events::EventStabilizedTaredWeightChanged outgoingEvent = {
             .grams = taredGrams,
         };

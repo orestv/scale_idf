@@ -166,6 +166,7 @@ void app_main(void)
             .topicStable=MQTT_TOPIC_STABLE,
         },
         .mqttClient=mqttClient,
+        .eventLoop=scaleEventLoop,
     };
     scale::mqtt::MQTTReport mqttReport(reportConfig);
 

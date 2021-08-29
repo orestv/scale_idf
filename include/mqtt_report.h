@@ -3,6 +3,8 @@
 #include <string>
 #include <mqtt.h>
 
+#include "scale/events.h"
+
 namespace scale::mqtt {
     struct MQTTReportTopics {
         std::string topicWeight;
@@ -11,6 +13,7 @@ namespace scale::mqtt {
     struct MQTTReportConfig {  
         MQTTReportTopics topics;
         MQTTClient &mqttClient;
+        esp_event_loop_handle_t eventLoop;
     };
 
     class MQTTDebouncer {
@@ -34,11 +37,13 @@ namespace scale::mqtt {
     public:
         MQTTReport(const MQTTReportConfig &config);
 
+    private:
         void reportWeight(float grams);
         void reportStable(bool stable);
-    private:
+
         MQTTReportTopics _topics;
         MQTTClient &_mqttClient;
+        esp_event_loop_handle_t _eventLoop;
 
         MQTTDebouncer _debouncer;
 

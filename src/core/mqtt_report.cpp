@@ -8,8 +8,21 @@ namespace scale::mqtt {
     MQTTReport::MQTTReport(const MQTTReportConfig &config):
             _topics(config.topics),
             _mqttClient(config.mqttClient),
+            _eventLoop(config.eventLoop),
             _debouncer(1000) {
         
+        esp_event_handler_register_with(
+            _eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_STABILIZED_TARED_WEIGHT_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                auto &_this = *(MQTTReport*)arg;
+                auto &event = *(events::EventStabilizedTaredWeightChanged*)event_data;
+
+                _this.reportWeight(event.grams);
+            },
+            this
+        );
     }
 
     void MQTTReport::reportWeight(float grams) {

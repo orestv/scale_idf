@@ -9,7 +9,7 @@
 #include "raw_scale.h"
 #include "weight_converter.h"
 
-#include "scale_events.h"
+#include "scale/events.h"
 
 namespace scale::adapted {
     struct ScaleEvent {

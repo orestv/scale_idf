@@ -1,4 +1,4 @@
-#include "controller.h"
+#include "scale/controller.h"
 
 #include "esp_log.h"
 

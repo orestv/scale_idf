@@ -10,7 +10,7 @@
 
 #include <hx711.h>
 
-#include "scale_events.h"
+#include "scale/events.h"
 
 namespace scale::raw {
     struct ScaleConfig {

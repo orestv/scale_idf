@@ -37,7 +37,7 @@
 
 #include "maintenance.h"
 
-#include "controller.h"
+#include "scale/controller.h"
 
 #include "scale_lcd.h"
 

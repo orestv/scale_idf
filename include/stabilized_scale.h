@@ -2,7 +2,7 @@
 
 #include "stabilizer.h"
 
-#include "scale_events.h"
+#include "scale/events.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>

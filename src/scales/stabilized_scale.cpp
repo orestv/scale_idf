@@ -18,20 +18,7 @@ namespace scale::stabilized {
             }, 
             this
         );
-            // xTaskCreate(
-            //     [](void *arg)
-            //     {
-            //         ((StabilizedScale *)arg)->task();
-            //     },
-            //     "StabilizedScale", 2048, this, 10, nullptr);
     }
-
-    // void StabilizedScale::task() {
-        // while (true) {
-            // scale::adapted::ScaleEvent incomingEvent = _adaptedScale.getEvent();
-            // processEvent(incomingEvent);
-        // }        
-    // }
 
     void StabilizedScale::processEvent(const events::EventRawWeightChanged &incomingEvent) {
         _stabilizer.push(incomingEvent.grams);

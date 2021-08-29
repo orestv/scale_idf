@@ -1,7 +1,7 @@
 #pragma once
 
 #include "led.h"
-#include "scale_events.h"
+#include "scale/events.h"
 
 namespace scale::color {
     struct ColorReportArgs {

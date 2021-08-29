@@ -20,7 +20,7 @@
 
 #include "wifi.h"
 #include "led.h"
-#include "color_report.h"
+#include "scale/color_report.h"
 #include "mqtt_report.h"
 #include "mqtt.h"
 
@@ -181,10 +181,11 @@ void app_main(void)
         .maintenance = maintenance,
         .colorReport = colorReport,
         .stabilizedScale = stabilizedScale,
-        .tare=tare,
-        .tareConfigBuilder=tareConfigBuilder,
-        .mqttReport=mqttReport,
-        .lcd=lcd,
+        .tare = tare,
+        .tareConfigBuilder = tareConfigBuilder,
+        .mqttReport = mqttReport,
+        .lcd = lcd,
+        .eventLoop = scaleEventLoop,
     };
     scale::controller::ScaleController controller(args);
     

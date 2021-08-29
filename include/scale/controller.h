@@ -3,10 +3,12 @@
 #include "scale_button.h"
 #include "stabilized_scale.h"
 #include "scale/tare.h"
-#include "color_report.h"
+#include "scale/color_report.h"
 #include "mqtt_report.h"
 #include "maintenance.h"
 #include "scale_lcd.h"
+
+#include "scale/events.h"
 
 namespace scale::controller {
     struct ScaleControllerArgs {
@@ -19,6 +21,7 @@ namespace scale::controller {
         tare::TareConfigBuilder &tareConfigBuilder;
         mqtt::MQTTReport &mqttReport;
         lcd::LCD &lcd;
+        esp_event_loop_handle_t eventLoop;
     };
 
     class ScaleController {
@@ -32,13 +35,21 @@ namespace scale::controller {
                 _tare(args.tare),
                 _tareConfigBuilder(args.tareConfigBuilder),
                 _mqttReport(args.mqttReport),
-                _lcd(args.lcd) {
+                _lcd(args.lcd),
+                _eventLoop(args.eventLoop) {
 
         }
 
         void start();
     private:
         void processScaleEvent(const stabilized::ScaleEvent &scaleEvent);
+
+        void onRawWeightChanged(const events::EventRawWeightChanged &event);
+        void onStabilizedWeightChanged(const events::EventStabilizedWeightChanged &event);
+
+        void onRawTaredWeightChanged(const events::EventRawTaredWeightChanged &event);
+        void onStabilizedTaredWeightChanged(const events::EventStabilizedTaredWeightChanged &event);
+
         void onTareButtonPressed();
         void onMaintenanceButtonPressed();
 
@@ -53,5 +64,6 @@ namespace scale::controller {
         tare::TareConfigBuilder &_tareConfigBuilder;
         mqtt::MQTTReport &_mqttReport;
         lcd::LCD &_lcd;
+        esp_event_loop_handle_t _eventLoop;
     };
 }

@@ -13,6 +13,7 @@ namespace scale::lcd {
             .mqttConnected = false,
             .grams = 0,
         };
+        subscribeToEvents();
     }
 
     void LCD::start() {
@@ -170,6 +171,5 @@ namespace scale::lcd {
                                          4, 20, 20));
 
         ESP_ERROR_CHECK(i2c_lcd1602_reset(_lcdInfo));
-        subscribeToEvents();
     }
 }

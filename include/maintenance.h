@@ -9,12 +9,14 @@ namespace scale::maintenance {
     public:
         Maintenance(esp_event_loop_handle_t eventLoop): _maintenanceModeOn(false), _eventLoop(eventLoop) {
             _load();
+            ESP_LOGI("Maintenance", "Maintenance mode is %s", _maintenanceModeOn ? "ON" : "OFF");
 
             esp_event_handler_register_with(
                 eventLoop,
                 events::SCALE_EVENT,
                 events::EVENT_BUTTON_MAINTENANCE_PRESSED,
                 [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                    ESP_LOGI("Maintenance", "Maintenance button press detected");
                     auto &_this = *(Maintenance*)arg;
                     _this.toggleMaintenanceMode();
                 },

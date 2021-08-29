@@ -23,6 +23,8 @@ namespace scale::events {
 
         EVENT_BUTTON_TARE_PRESSED,
         EVENT_BUTTON_MAINTENANCE_PRESSED,
+
+        EVENT_WEIGHT_REPORTED,
     };
 
     struct EventRawWeightChanged {

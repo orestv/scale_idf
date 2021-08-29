@@ -10,7 +10,7 @@ namespace scale::color {
             events::SCALE_EVENT,
             events::EVENT_RAW_TARED_WEIGHT_CHANGED,
             [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-                ESP_LOGI("ColorReport", "Received tared weight changed event");
+                ESP_LOGD("ColorReport", "Received tared weight changed event");
                 ColorReport &_this = *(ColorReport*)arg;
                 events::EventRawTaredWeightChanged &evt = *(events::EventRawTaredWeightChanged*)event_data;
                 _this.onWeightChanged(evt.grams);
@@ -20,7 +20,7 @@ namespace scale::color {
     }
 
     void ColorReport::onWeightChanged(float weight) {
-        ESP_LOGI("ColorReport", "Changing color for weight %f", weight);
+        ESP_LOGD("ColorReport", "Changing color for weight %f", weight);
         scale::led::Color red(255, 0, 0), green(0, 255, 0), yellow(255, 255, 0);
 
         scale::led::Color color;

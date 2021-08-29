@@ -32,7 +32,7 @@ namespace scale::peri::button {
     public:
         PushButton(const ButtonConfig &config): _config(config) {
             _debouncer = Debouncer();
-            _buttonEventQueue = xQueueCreate(10, sizeof(ButtonEvent));
+            _q = xQueueCreate(10, 0);
             start();
         }
 
@@ -42,8 +42,9 @@ namespace scale::peri::button {
         std::string tag() const;
         void start();
 
+        xQueueHandle _q;
+
         Debouncer _debouncer;
-        xQueueHandle _buttonEventQueue;
         ButtonConfig _config;
     };
 }

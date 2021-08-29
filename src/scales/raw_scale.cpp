@@ -9,13 +9,13 @@
 namespace scale::raw {
 
     void Scale::start() {
-        ESP_LOGI(tag().c_str(), "Starting the scale");
+        ESP_LOGD(tag().c_str(), "Starting the scale");
 
         while (1) {
             esp_err_t r = hx711_init(&_dev);
             if (r == ESP_OK)
                 break;
-            ESP_LOGI(tag().c_str(), "Could not initialize HX711: %d (%s)\n", r, esp_err_to_name(r));
+            ESP_LOGD(tag().c_str(), "Could not initialize HX711: %d (%s)\n", r, esp_err_to_name(r));
             vTaskDelay(pdMS_TO_TICKS(500));
         }
 
@@ -24,7 +24,7 @@ namespace scale::raw {
 
     void Scale::process(void *arg) {
         Scale *_this = (Scale*)arg;
-        ESP_LOGI(_this->tag().c_str(), "Starting task process...");
+        ESP_LOGD(_this->tag().c_str(), "Starting task process...");
 
         while (true) {
             esp_err_t r = hx711_wait(&_this->_dev, 10);
@@ -42,9 +42,9 @@ namespace scale::raw {
             ScaleEvent event = {
                 .rawData = data,
             };
-            ESP_LOGI(_this->tag().c_str(), "Sending raw data");
+            ESP_LOGD(_this->tag().c_str(), "Sending raw data");
             xQueueSend(_this->_scaleEventQueue, &event, portMAX_DELAY);
-            // ESP_LOGI(_this->tag().c_str(), "Raw data: %d", data);
+            // ESP_LOGD(_this->tag().c_str(), "Raw data: %d", data);
             vTaskDelay(pdMS_TO_TICKS(100));
         }
     }

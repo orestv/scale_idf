@@ -13,9 +13,9 @@ namespace scale::persistence {
     
     template <typename T>
     esp_err_t save(const T &data, const std::string tag) {
-        const char *NAMESPACE = "storage";
         const char *TAG2 = "PersistenceUtil";
-        ESP_LOGI(TAG2, "Persisting data");
+        ESP_LOGI(TAG2, "Persisting data for tag %s", tag.c_str());
+        const char *NAMESPACE = "storage";
         nvs_handle_t nvs_handle;
         esp_err_t err;
 
@@ -32,15 +32,15 @@ namespace scale::persistence {
             ESP_LOGE(TAG2, "Error saving data: %d (%s)", err, esp_err_to_name(err));
             return err;
         }
-        ESP_LOGI(TAG2, "Data persisted");
+        ESP_LOGI(TAG2, "Data persisted %s", tag.c_str());
         return ESP_OK;
     }
 
     template <typename T>
     esp_err_t load(T &data, const std::string tag) {
-        const char *NAMESPACE = "storage";
         const char *TAG2 = "PersistenceUtil";
-        ESP_LOGI(TAG2, "Loading data");
+        ESP_LOGI(TAG2, "Loading data for tag %s", tag.c_str());
+        const char *NAMESPACE = "storage";
         nvs_handle_t nvs_handle;
         esp_err_t err;
 
@@ -58,7 +58,7 @@ namespace scale::persistence {
             ESP_LOGE(TAG2, "Error loading data: %d (%s)", err, esp_err_to_name(err));
             return err;
         }
-        ESP_LOGI(TAG2, "Data loaded");
+        ESP_LOGI(TAG2, "Data loaded %s", tag.c_str());
         return ESP_OK;
     }
 }

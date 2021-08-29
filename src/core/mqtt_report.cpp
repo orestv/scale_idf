@@ -31,18 +31,18 @@ namespace scale::mqtt {
         oss << grams;
 
         if (_maintenance.isMaintenanceModeOn()) {
-            ESP_LOGI(tag, "Maintenance mode on: not reporting weight");
+            ESP_LOGD(tag, "Maintenance mode on: not reporting weight");
             return;
         }
 
-        ESP_LOGI(tag, "Reporting weight %f over MQTT", grams);
+        ESP_LOGD(tag, "Reporting weight %f over MQTT", grams);
         if (!_mqttClient.isConnected()) {
-            ESP_LOGW(tag, "MQTT not connected, weight report skipped");
+            ESP_LOGD(tag, "MQTT not connected, weight report skipped");
             return;
         }        
 
         if (!_debouncer.shouldPublish(grams)) {
-            ESP_LOGI(tag, "Debouncer blocking report, not sending");
+            ESP_LOGD(tag, "Debouncer blocking report, not sending");
             return;
         }
 

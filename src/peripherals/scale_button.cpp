@@ -22,6 +22,31 @@ namespace scale::peri::button {
             .intr_type = GPIO_INTR_POSEDGE,
         };
 
+        xTaskCreate(
+            [](void *arg) {
+                auto &_this = *(PushButton*)arg;
+                while (true) {
+                    xQueueReceive(_this._q, nullptr, portMAX_DELAY);
+                    ESP_LOGI(_this.tag().c_str(), "Button receive q event");
+                    auto level = gpio_get_level(_this._config.buttonGPIO);
+                    if (level == 1) {
+                        if (!_this._debouncer.trigger()) {
+                            return;
+                        }
+                        esp_event_post_to(
+                            _this._config.eventLoop,
+                            events::SCALE_EVENT,
+                            _this._config.eventID,
+                            nullptr,
+                            0,
+                            0
+                        );
+                    }
+                }
+            },
+            "Q Handler", 2048, this, 10, nullptr
+        );
+
         gpio_config(&buttonConfig);
         ESP_LOGI(tag().c_str(), "Configuring button on GPIO %d", _config.buttonGPIO);
         gpio_isr_handler_add(_config.buttonGPIO, PushButton::gpio_isr_handler, this);
@@ -36,16 +61,6 @@ namespace scale::peri::button {
 
     void IRAM_ATTR PushButton::gpio_isr_handler(void* arg) {
         auto &_this = *(PushButton*)arg;
-        if (!_this._debouncer.trigger()) {
-            return;
-        }
-        esp_event_isr_post_to(
-            _this._config.eventLoop,
-            events::SCALE_EVENT,
-            _this._config.eventID,
-            nullptr,
-            0,
-            nullptr
-        );
+        xQueueSend(_this._q, nullptr, 0);
     }
 }

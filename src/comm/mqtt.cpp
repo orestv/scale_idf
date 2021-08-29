@@ -53,7 +53,7 @@ namespace scale::mqtt {
     }
 
     void MQTTClient::mqttEventHandler(esp_event_base_t base, int32_t event_id, void *event_data) {
-        ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
+        ESP_LOGI(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
         esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t)event_data;
         esp_mqtt_client_handle_t client = event->client;
         int msg_id;

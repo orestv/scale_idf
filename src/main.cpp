@@ -37,8 +37,9 @@
 
 #include "maintenance.h"
 
+#include "scale/events.h"
+
 #include "scale/lcd.h"
-#include "scale/controller.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
 
@@ -110,10 +111,15 @@ void app_main(void)
         {
             .buttonGPIO = GPIO_BUTTON_TARE,
             .eventLoop = scaleEventLoop,
+            .eventID = scale::events::EVENT_BUTTON_TARE_PRESSED,
         }
     );
     scale::peri::button::PushButton buttonMaintenance(
-        {.buttonGPIO = GPIO_BUTTON_MAINTENANCE,}
+        {
+            .buttonGPIO = GPIO_BUTTON_MAINTENANCE,
+            .eventLoop = scaleEventLoop,
+            .eventID = scale::events::EVENT_BUTTON_MAINTENANCE_PRESSED,
+        }
     );
 
     scale::raw::Scale rawScale(
@@ -163,8 +169,6 @@ void app_main(void)
     };
     scale::mqtt::MQTTReport mqttReport(reportConfig);
 
-    stabilizedScale.start();
-
     scale::lcd::LCDConfig lcdConfig = {
         .gpioSDA = GPIO_LCD_SDA,
         .gpioSCL = GPIO_LCD_SCL,
@@ -174,22 +178,6 @@ void app_main(void)
     lcd.start();
 
     scale::maintenance::Maintenance maintenance;
-
-    scale::controller::ScaleControllerArgs args = {
-        .buttonTare = buttonTare,
-        .buttonMaintenance = buttonMaintenance,
-        .maintenance = maintenance,
-        .colorReport = colorReport,
-        .stabilizedScale = stabilizedScale,
-        .tare = tare,
-        .tareConfigBuilder = tareConfigBuilder,
-        .mqttReport = mqttReport,
-        .lcd = lcd,
-        .eventLoop = scaleEventLoop,
-    };
-    scale::controller::ScaleController controller(args);
-    
-    controller.start();
 
     while (true) {
         vTaskDelay(portMAX_DELAY);

@@ -51,7 +51,7 @@ namespace scale::tare {
     private:
         void onRawWeightChanged(const events::EventRawWeightChanged &evt);
         void onStabilizedWeightChanged(const events::EventStabilizedWeightChanged &evt);
-        void onTareRequested(const events::EventTareStarted &evt);
+        void onTareRequested();
 
         bool _taring;
 

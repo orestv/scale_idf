@@ -4,6 +4,14 @@
 
 namespace scale::stabilized {
 
+    const char *TAG = "StabilizedScale";
+
+    StabilizedScale::StabilizedScale(Stabilizer &stabilizer, esp_event_loop_handle_t eventLoop) : _eventLoop(eventLoop),
+                                                                                 _stabilizer(stabilizer) {
+        _eventQueue = xQueueCreate(10, sizeof(ScaleEvent));
+        start();
+    }
+
     void StabilizedScale::start() {
         esp_event_handler_register_with(
             _eventLoop,
@@ -19,18 +27,13 @@ namespace scale::stabilized {
     }
 
     void StabilizedScale::processEvent(const events::EventRawWeightChanged &incomingEvent) {
+        ESP_LOGI(TAG, "Received adapted data, stabilizing");
         _stabilizer.push(incomingEvent.grams);
         if (!_stabilizer.isStable()) {
             // todo: send "unstable" event
-            ScaleEvent outgoingEvent = {
-                .eventType=EVENT_UNSTABLE,
-                .grams=0,
-                .gramsRaw=incomingEvent.grams,
-            };
-            xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
             return;
         }
-        // todo: send "stable" event;        
+        // todo: send "stable" event   
         float stabilizedValue = _stabilizer.getValue();
         events::EventStabilizedWeightChanged evt = {
             .grams = stabilizedValue,
@@ -44,17 +47,5 @@ namespace scale::stabilized {
             sizeof(evt),
             portMAX_DELAY
         );
-        // ScaleEvent outgoingEvent = {
-        //     .eventType=EVENT_STABLE_WEIGHT,
-        //     .grams=stabilizedValue,
-        //     .gramsRaw=incomingEvent.grams,
-        // };
-        // xQueueSend(_eventQueue, &outgoingEvent, portMAX_DELAY);
-    }
-
-    ScaleEvent StabilizedScale::getEvent() {
-        ScaleEvent event;
-        xQueueReceive(_eventQueue, &event, portMAX_DELAY);
-        return event;
     }
 }

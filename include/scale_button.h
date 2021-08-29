@@ -12,6 +12,7 @@ namespace scale::peri::button {
     struct ButtonConfig {
         gpio_num_t buttonGPIO;
         esp_event_loop_handle_t eventLoop;
+        events::Event eventID;
     };
 
     struct ButtonEvent {
@@ -34,8 +35,6 @@ namespace scale::peri::button {
             _buttonEventQueue = xQueueCreate(10, sizeof(ButtonEvent));
             start();
         }
-
-        ButtonEvent getEvent();
 
     private:
         static void IRAM_ATTR gpio_isr_handler(void* arg);

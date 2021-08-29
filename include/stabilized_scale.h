@@ -21,15 +21,10 @@ namespace scale::stabilized {
 
     class StabilizedScale {
     public:
-        StabilizedScale(Stabilizer &stabilizer, esp_event_loop_handle_t eventLoop): 
-                _eventLoop(eventLoop),
-                _stabilizer(stabilizer) {
-            _eventQueue = xQueueCreate(10, sizeof(ScaleEvent));
-        }
-        void start();
-        ScaleEvent getEvent();
+        StabilizedScale(Stabilizer &stabilizer, esp_event_loop_handle_t eventLoop);
+
     private:
-        void task();
+        void start();
         void processEvent(const events::EventRawWeightChanged &incomingEvent);
         xQueueHandle _eventQueue;
         esp_event_loop_handle_t _eventLoop;

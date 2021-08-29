@@ -5,7 +5,7 @@
 namespace scale::events {
     ESP_EVENT_DECLARE_BASE(SCALE_EVENT);
 
-    enum Events {
+    enum Event {
         EVENT_RAW_WEIGHT_CHANGED,
         EVENT_RAW_TARED_WEIGHT_CHANGED,
         EVENT_STABILIZED_WEIGHT_CHANGED,

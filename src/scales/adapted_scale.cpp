@@ -11,12 +11,15 @@ namespace scale::adapted {
 
     void AdaptedScale::task() {
         while (true) {
+            ESP_LOGD("AdaptedScale", "Awaiting incoming event");
             raw::ScaleEvent incomingEvent = _scale.getEvent();
+            ESP_LOGD("AdaptedScale", "Incoming event received, processing");
             processEvent(incomingEvent);
         }
     }
 
     void AdaptedScale::processEvent(const raw::ScaleEvent &incomingEvent) {
+        ESP_LOGD("AdaptedScale", "Sending adapted scale event");
         events::EventRawWeightChanged outgoingEvent = this->convertEvent(incomingEvent);
         esp_event_post_to(
             _eventLoop,

@@ -42,6 +42,7 @@ namespace scale::raw {
             ScaleEvent event = {
                 .rawData = data,
             };
+            ESP_LOGI(_this->tag().c_str(), "Sending raw data");
             xQueueSend(_this->_scaleEventQueue, &event, portMAX_DELAY);
             // ESP_LOGI(_this->tag().c_str(), "Raw data: %d", data);
             vTaskDelay(pdMS_TO_TICKS(100));

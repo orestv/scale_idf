@@ -1,7 +1,9 @@
-#include "scale/lcd.h"
-
-#include "sstream"
 #include <iomanip>
+
+#include "scale/lcd.h"
+#include "sstream"
+
+#include "scale/widgets/widgets.h"
 
 namespace scale::lcd {
     const char *TAG = "LCD";
@@ -9,10 +11,9 @@ namespace scale::lcd {
     LCD::LCD(const LCDConfig &config): _config(config), _lcdInfo(nullptr) {
         _eventQueue = xQueueCreate(10, sizeof(LCDEvent));
         _state = {
-            .wifiConnected = false,
-            .mqttConnected = false,
             .grams = 0,
-        };
+            .maintenance = false,
+        };        
         subscribeToEvents();
     }
 
@@ -21,6 +22,10 @@ namespace scale::lcd {
             [](void *arg) {
                 LCD &_this = *((LCD*)arg);
                 _this.init();
+                std::unique_ptr<BaseWidget> wifiWidget(new WifiWidget(_this._lcdInfo, _this._config.eventLoop));
+                std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop));
+                _this._widgets.push_back(std::move(wifiWidget));
+                _this._widgets.push_back(std::move(mqttWidget));
                 while (true) {
                     _this.taskLoop();
                 }
@@ -37,24 +42,11 @@ namespace scale::lcd {
     }
 
     void LCD::render() {
-        renderWifi();
-        renderMQTT();
         renderWeight();
         renderMaintenance();
-    }
-    void LCD::renderWifi() {
-        i2c_lcd1602_move_cursor(_lcdInfo, 18, 0);
-        char mqttStateChar = _state.wifiConnected ? '+' : '-';
-        i2c_lcd1602_write_char(_lcdInfo, 'W');
-        i2c_lcd1602_move_cursor(_lcdInfo, 19, 0);
-        i2c_lcd1602_write_char(_lcdInfo, mqttStateChar);
-    }
-    void LCD::renderMQTT() {
-        i2c_lcd1602_move_cursor(_lcdInfo, 18, 1);
-        char mqttStateChar = _state.mqttConnected ? '+' : '-';
-        i2c_lcd1602_write_char(_lcdInfo, 'M');
-        i2c_lcd1602_move_cursor(_lcdInfo, 19, 1);
-        i2c_lcd1602_write_char(_lcdInfo, mqttStateChar);
+        for (auto &widget : _widgets) {
+            widget->render();
+        }
     }
     void LCD::renderWeight() {
         std::stringstream oss;
@@ -68,16 +60,6 @@ namespace scale::lcd {
         const char *sMaintenance = _state.maintenance ? "MAINTENANCE" : "           ";
         i2c_lcd1602_move_cursor(_lcdInfo, 0, 0);
         i2c_lcd1602_write_string(_lcdInfo, sMaintenance);
-    }
-
-    void LCD::setWifiState(bool wifiConnected) {
-        _state.wifiConnected = wifiConnected;
-        requestRedraw();
-    }
-
-    void LCD::setMQTTState(bool mqttConnected) {
-        _state.mqttConnected = mqttConnected;
-        requestRedraw();
     }
 
     void LCD::setWeight(float grams) {
@@ -111,26 +93,6 @@ namespace scale::lcd {
             }, 
             this
         );
-        esp_event_handler_register_with(
-            _config.eventLoop,
-            events::SCALE_EVENT,
-            events::EVENT_WIFI_CONNECTION_CHANGED,
-            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-                LCD &_this = *(LCD *)arg;
-                auto &evt = *(events::EventWifiConnectionChanged *)event_data;
-                _this.setWifiState(evt.connected);
-            },
-            this);
-        esp_event_handler_register_with(
-            _config.eventLoop,
-            events::SCALE_EVENT,
-            events::EVENT_MQTT_CONNECTION_CHANGED,
-            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-                LCD &_this = *(LCD *)arg;
-                auto &evt = *(events::EventMQTTConnectionChanged *)event_data;
-                _this.setMQTTState(evt.connected);
-            },
-            this);
         esp_event_handler_register_with(
             _config.eventLoop,
             events::SCALE_EVENT,
@@ -171,5 +133,6 @@ namespace scale::lcd {
                                          4, 20, 20));
 
         ESP_ERROR_CHECK(i2c_lcd1602_reset(_lcdInfo));
+        i2c_lcd1602_clear(_lcdInfo);
     }
 }

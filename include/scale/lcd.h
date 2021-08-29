@@ -13,6 +13,11 @@
 
 #include "scale/events.h"
 
+#include "widgets/base.h"
+
+#include <memory>
+#include <vector>
+
 #include "smbus.h"
 #include "i2c-lcd1602.h"
 
@@ -34,8 +39,6 @@ namespace scale::lcd {
     };
 
     struct LCDState {
-        bool wifiConnected;
-        bool mqttConnected;
         float grams;
         bool maintenance;
     };
@@ -45,8 +48,6 @@ namespace scale::lcd {
         LCD(const LCDConfig &config);
 
         void start();
-        void setWifiState(bool wifiConnected);
-        void setMQTTState(bool mqttConnected);
         void setWeight(float grams);
         void setMaintenance(bool maintenance);
     private:
@@ -58,14 +59,14 @@ namespace scale::lcd {
         void requestRedraw();
 
         void render();
-        void renderWifi();
-        void renderMQTT();
         void renderWeight();
         void renderMaintenance();
 
         void onWeightChanged(const events::EventStabilizedTaredWeightChanged &evt);
 
         xQueueHandle _eventQueue;
+
+        std::vector<std::unique_ptr<BaseWidget>> _widgets;
 
         LCDState _state;
 

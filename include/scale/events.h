@@ -10,8 +10,20 @@ namespace scale::events {
         EVENT_RAW_TARED_WEIGHT_CHANGED,
         EVENT_STABILIZED_WEIGHT_CHANGED,
         EVENT_STABILIZED_TARED_WEIGHT_CHANGED,
+
+        EVENT_SCALE_UNSTABLE,
+
         EVENT_WIFI_CONNECTION_CHANGED,
-        EVENT_MQTT_CONNECTION_CHANGED,        
+        EVENT_MQTT_CONNECTION_CHANGED,
+
+        EVENT_TARE_STARTED,
+        EVENT_TARE_COMPLETE,
+
+        EVENT_MAINTENANCE_MODE_ON,
+        EVENT_MAINTENANCE_MODE_OFF,
+
+        EVENT_BUTTON_TARE_PRESSED,
+        EVENT_BUTTON_MAINTENANCE_PRESSED,
     };
 
     struct EventRawWeightChanged {
@@ -27,4 +39,12 @@ namespace scale::events {
     {
         float grams;
     };
+
+    struct EventScaleUnstable {};
+
+    struct EventWifiConnectionChanged  {};
+    struct EventMQTTConnectionChanged {};
+
+    struct EventTareStarted {};
+    struct EventTareComplete {};
 }

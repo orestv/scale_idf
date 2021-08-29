@@ -4,6 +4,8 @@
 
 #include "tare_persistence.h"
 
+#include "scale/events.h"
+
 namespace scale::tare {
     struct TareConfig {
         float tareGrams;

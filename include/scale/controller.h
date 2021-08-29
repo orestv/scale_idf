@@ -2,7 +2,7 @@
 
 #include "scale_button.h"
 #include "stabilized_scale.h"
-#include "tare_controller.h"
+#include "scale/tare.h"
 #include "color_report.h"
 #include "mqtt_report.h"
 #include "maintenance.h"

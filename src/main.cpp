@@ -33,7 +33,7 @@
 #include "stabilized_scale.h"
 #include "adapted_scale.h"
 #include "tare_persistence.h"
-#include "tare_controller.h"
+#include "scale/tare.h"
 
 #include "maintenance.h"
 

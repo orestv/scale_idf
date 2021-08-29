@@ -1,4 +1,4 @@
-#include "tare_controller.h"
+#include "scale/tare.h"
 
 namespace scale::tare {
     void TareConfigBuilder::push(float grams) {

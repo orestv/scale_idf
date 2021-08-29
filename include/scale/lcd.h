@@ -37,6 +37,7 @@ namespace scale::lcd {
         bool wifiConnected;
         bool mqttConnected;
         float grams;
+        bool maintenance;
     };
 
     class LCD {
@@ -47,6 +48,7 @@ namespace scale::lcd {
         void setWifiState(bool wifiConnected);
         void setMQTTState(bool mqttConnected);
         void setWeight(float grams);
+        void setMaintenance(bool maintenance);
     private:
 
         void init();
@@ -59,6 +61,7 @@ namespace scale::lcd {
         void renderWifi();
         void renderMQTT();
         void renderWeight();
+        void renderMaintenance();
 
         void onWeightChanged(const events::EventStabilizedTaredWeightChanged &evt);
 

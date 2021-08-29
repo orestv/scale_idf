@@ -39,6 +39,7 @@ namespace scale::lcd {
         renderWifi();
         renderMQTT();
         renderWeight();
+        renderMaintenance();
     }
     void LCD::renderWifi() {
         i2c_lcd1602_move_cursor(_lcdInfo, 18, 0);
@@ -62,6 +63,12 @@ namespace scale::lcd {
         i2c_lcd1602_write_string(_lcdInfo, oss.str().c_str());
     }
 
+    void LCD::renderMaintenance() {
+        const char *sMaintenance = _state.maintenance ? "MAINTEANCE" : "           ";
+        i2c_lcd1602_move_cursor(_lcdInfo, 0, 0);
+        i2c_lcd1602_write_string(_lcdInfo, sMaintenance);
+    }
+
     void LCD::setWifiState(bool wifiConnected) {
         _state.wifiConnected = wifiConnected;
         requestRedraw();
@@ -74,6 +81,11 @@ namespace scale::lcd {
 
     void LCD::setWeight(float grams) {
         _state.grams = grams;
+        requestRedraw();
+    }
+
+    void LCD::setMaintenance(bool maintenance) {
+        _state.maintenance = maintenance;
         requestRedraw();
     }
 
@@ -116,6 +128,16 @@ namespace scale::lcd {
                 LCD &_this = *(LCD *)arg;
                 auto &evt = *(events::EventMQTTConnectionChanged *)event_data;
                 _this.setMQTTState(evt.connected);
+            },
+            this);
+        esp_event_handler_register_with(
+            _config.eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_MAINTENANCE_MODE_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                LCD &_this = *(LCD *)arg;
+                auto &evt = *(events::EventMaintenanceModeChanged *)event_data;
+                _this.setMaintenance(evt.isMaintenanceModeOn);
             },
             this);
     }

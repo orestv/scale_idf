@@ -160,16 +160,6 @@ void app_main(void)
     );
     mqttClient.start();
 
-    scale::mqtt::MQTTReportConfig reportConfig = {
-        .topics = {
-            .topicWeight=MQTT_TOPIC_WEIGHT,
-            .topicStable=MQTT_TOPIC_STABLE,
-        },
-        .mqttClient=mqttClient,
-        .eventLoop=scaleEventLoop,
-    };
-    scale::mqtt::MQTTReport mqttReport(reportConfig);
-
     scale::lcd::LCDConfig lcdConfig = {
         .gpioSDA = GPIO_LCD_SDA,
         .gpioSCL = GPIO_LCD_SCL,
@@ -178,7 +168,18 @@ void app_main(void)
     scale::lcd::LCD lcd(lcdConfig);
     lcd.start();
 
-    scale::maintenance::Maintenance maintenance;
+    scale::maintenance::Maintenance maintenance(scaleEventLoop);
+
+    scale::mqtt::MQTTReportConfig reportConfig = {
+        .topics = {
+            .topicWeight = MQTT_TOPIC_WEIGHT,
+            .topicStable = MQTT_TOPIC_STABLE,
+        },
+        .mqttClient = mqttClient,
+        .maintenance = maintenance,
+        .eventLoop = scaleEventLoop,
+    };
+    scale::mqtt::MQTTReport mqttReport(reportConfig);
 
     while (true) {
         vTaskDelay(portMAX_DELAY);

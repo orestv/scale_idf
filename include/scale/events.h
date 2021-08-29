@@ -19,8 +19,7 @@ namespace scale::events {
         EVENT_TARE_STARTED,
         EVENT_TARE_COMPLETE,
 
-        EVENT_MAINTENANCE_MODE_ON,
-        EVENT_MAINTENANCE_MODE_OFF,
+        EVENT_MAINTENANCE_MODE_CHANGED,
 
         EVENT_BUTTON_TARE_PRESSED,
         EVENT_BUTTON_MAINTENANCE_PRESSED,
@@ -47,6 +46,10 @@ namespace scale::events {
     };
     struct EventMQTTConnectionChanged {
         bool connected;
+    };
+
+    struct EventMaintenanceModeChanged {
+        bool isMaintenanceModeOn;
     };
 
     struct EventTareStarted {};

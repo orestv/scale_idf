@@ -8,6 +8,7 @@ namespace scale::mqtt {
     MQTTReport::MQTTReport(const MQTTReportConfig &config):
             _topics(config.topics),
             _mqttClient(config.mqttClient),
+            _maintenance(config.maintenance),
             _eventLoop(config.eventLoop),
             _debouncer(1000) {
         
@@ -28,6 +29,11 @@ namespace scale::mqtt {
     void MQTTReport::reportWeight(float grams) {
         std::ostringstream oss;
         oss << grams;
+
+        if (_maintenance.isMaintenanceModeOn()) {
+            ESP_LOGI(tag, "Maintenance mode on: not reporting weight");
+            return;
+        }
 
         ESP_LOGI(tag, "Reporting weight %f over MQTT", grams);
         if (!_mqttClient.isConnected()) {

@@ -4,6 +4,8 @@
 #include "scale/mqtt.h"
 #include "scale/events.h"
 
+#include "maintenance.h"
+
 namespace scale::mqtt {
     struct MQTTReportTopics {
         std::string topicWeight;
@@ -12,6 +14,7 @@ namespace scale::mqtt {
     struct MQTTReportConfig {  
         MQTTReportTopics topics;
         MQTTClient &mqttClient;
+        maintenance::Maintenance &maintenance;
         esp_event_loop_handle_t eventLoop;
     };
 
@@ -42,6 +45,7 @@ namespace scale::mqtt {
 
         MQTTReportTopics _topics;
         MQTTClient &_mqttClient;
+        maintenance::Maintenance &_maintenance;
         esp_event_loop_handle_t _eventLoop;
 
         MQTTDebouncer _debouncer;

@@ -65,6 +65,14 @@ namespace scale::mqtt {
             message.message.c_str(),
             0, message.qos, 0
         );
+        esp_event_post_to(
+            _config.eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_WEIGHT_REPORTED,
+            nullptr,
+            0,
+            0
+        );
     }
 
     void MQTTClient::mqttEventHandler(esp_event_base_t base, int32_t event_id, void *event_data) {

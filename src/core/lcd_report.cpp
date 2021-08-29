@@ -25,11 +25,14 @@ namespace scale::lcd {
                 std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop));
                 std::unique_ptr<BaseWidget> weightWidget(new WeightWidget(_this._lcdInfo, _this._config.eventLoop));
                 std::unique_ptr<BaseWidget> maintenanceWidget(new MaintenanceWidget(_this._lcdInfo, _this._config.eventLoop));
+                std::unique_ptr<BaseWidget> weightReportWidget(new WeightReportWidget(_this._lcdInfo, _this._config.eventLoop));
 
                 _this._widgets.push_back(std::move(wifiWidget));
                 _this._widgets.push_back(std::move(mqttWidget));
                 _this._widgets.push_back(std::move(weightWidget));
                 _this._widgets.push_back(std::move(maintenanceWidget));
+                _this._widgets.push_back(std::move(weightReportWidget));
+                
                 xQueueSend(_this._readyQueue, nullptr, portMAX_DELAY);
                 while (true) {
                     _this.taskLoop();

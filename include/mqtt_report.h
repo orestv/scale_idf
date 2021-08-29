@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string>
-#include <mqtt.h>
-
+#include "scale/mqtt.h"
 #include "scale/events.h"
 
 namespace scale::mqtt {

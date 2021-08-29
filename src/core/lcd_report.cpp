@@ -41,7 +41,11 @@ namespace scale::lcd {
         renderWeight();
     }
     void LCD::renderWifi() {
-
+        i2c_lcd1602_move_cursor(_lcdInfo, 18, 0);
+        char mqttStateChar = _state.wifiConnected ? '+' : '-';
+        i2c_lcd1602_write_char(_lcdInfo, 'W');
+        i2c_lcd1602_move_cursor(_lcdInfo, 19, 0);
+        i2c_lcd1602_write_char(_lcdInfo, mqttStateChar);
     }
     void LCD::renderMQTT() {
         i2c_lcd1602_move_cursor(_lcdInfo, 18, 1);
@@ -94,6 +98,26 @@ namespace scale::lcd {
             }, 
             this
         );
+        esp_event_handler_register_with(
+            _config.eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_WIFI_CONNECTION_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                LCD &_this = *(LCD *)arg;
+                auto &evt = *(events::EventWifiConnectionChanged *)event_data;
+                _this.setWifiState(evt.connected);
+            },
+            this);
+        esp_event_handler_register_with(
+            _config.eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_MQTT_CONNECTION_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                LCD &_this = *(LCD *)arg;
+                auto &evt = *(events::EventMQTTConnectionChanged *)event_data;
+                _this.setMQTTState(evt.connected);
+            },
+            this);
     }
 
     void LCD::init() {

@@ -18,11 +18,11 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#include "wifi.h"
+#include "scale/wifi.h"
 #include "led.h"
 #include "scale/color_report.h"
 #include "mqtt_report.h"
-#include "mqtt.h"
+#include "scale/mqtt.h"
 
 #include "scale_button.h"
 
@@ -147,7 +147,7 @@ void app_main(void)
     scale::tare::TareConfigBuilder tareConfigBuilder;
     scale::tare::Tare tare(tarePersistence, scaleEventLoop);
 
-    scale::wifi::WifiClient wifiClient({.hostname=AP_HOSTNAME});
+    scale::wifi::WifiClient wifiClient({.hostname=AP_HOSTNAME, .eventLoop=scaleEventLoop});
     wifiClient.start(
         {
             .ssid=AP_SSID,
@@ -156,7 +156,7 @@ void app_main(void)
     );
 
     scale::mqtt::MQTTClient mqttClient(
-        {.brokerUrl=MQTT_BROKER_URL}, {}
+        {.brokerUrl=MQTT_BROKER_URL, .eventLoop=scaleEventLoop}, {}
     );
     mqttClient.start();
 

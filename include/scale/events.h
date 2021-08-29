@@ -42,8 +42,12 @@ namespace scale::events {
 
     struct EventScaleUnstable {};
 
-    struct EventWifiConnectionChanged  {};
-    struct EventMQTTConnectionChanged {};
+    struct EventWifiConnectionChanged  {
+        bool connected;
+    };
+    struct EventMQTTConnectionChanged {
+        bool connected;
+    };
 
     struct EventTareStarted {};
     struct EventTareComplete {};

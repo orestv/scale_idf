@@ -5,9 +5,12 @@
 
 #include "mqtt_client.h"
 
+#include "scale/events.h"
+
 namespace scale::mqtt {
     struct MQTTConfig {
         std::string brokerUrl;
+        esp_event_loop_handle_t eventLoop;
     };
 
     struct MQTTSubscription {
@@ -53,6 +56,19 @@ namespace scale::mqtt {
             bool isConnected() const;
         private:
             void mqttEventHandler(esp_event_base_t base, int32_t event_id, void *event_data);
+
+            void emitConnectionStateChange() {
+                events::EventMQTTConnectionChanged outgoingEvent = {
+                    .connected = _isConnected,
+                };
+                esp_event_post_to(
+                    _config.eventLoop,
+                    events::SCALE_EVENT,
+                    events::EVENT_MQTT_CONNECTION_CHANGED,
+                    &outgoingEvent,
+                    sizeof(outgoingEvent),
+                    portMAX_DELAY);
+            }
 
             MQTTConfig _config;
             MQTTSubscriptionConfig _subscriptions;

@@ -1,4 +1,4 @@
-#include "wifi.h"
+#include "scale/wifi.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -19,8 +19,6 @@ namespace scale::wifi {
 
     const char *TAG = "WIFI";
 
-
-
     void WifiClient::static_got_ip_handler(
         void* arg, esp_event_base_t event_base,
         int32_t event_id, void* event_data) {
@@ -32,13 +30,25 @@ namespace scale::wifi {
     void WifiClient::got_ip_handler(
         void* arg, esp_event_base_t event_base,
         int32_t event_id, void* event_data) {
+
+        auto &_this = *(WifiClient*)arg;
         
         ESP_LOGI(TAG, "Wifi Connected event");
 
         if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
             ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
             ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
-            xEventGroupSetBits(this->eventGroup(), WIFI_CONNECTED_BIT);
+            events::EventWifiConnectionChanged outgoingEvent = {
+                .connected = true,
+            };
+            esp_event_post_to(
+                _this._wifiConfig.eventLoop,
+                events::SCALE_EVENT,
+                events::EVENT_WIFI_CONNECTION_CHANGED,
+                &outgoingEvent,
+                sizeof(outgoingEvent),
+                portMAX_DELAY
+            );
         }
     }
 
@@ -53,14 +63,26 @@ namespace scale::wifi {
     void WifiClient::wifi_event_handler(
         void* arg, esp_event_base_t event_base,
         int32_t event_id, void* event_data) {
-        
+
+        auto& _this = *(WifiClient*)arg;
+
         ESP_LOGI(TAG, "Got Wifi event");
 
         if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
             esp_wifi_connect();
             return;
         } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-            esp_wifi_connect();
+            events::EventWifiConnectionChanged event = {
+                .connected = false,
+            };
+            esp_event_post_to(
+                _this._wifiConfig.eventLoop,
+                events::SCALE_EVENT,
+                events::EVENT_WIFI_CONNECTION_CHANGED,
+                &event,
+                sizeof(event),
+                portMAX_DELAY);
+            esp_wifi_connect();            
         }
     }
 
@@ -118,29 +140,6 @@ namespace scale::wifi {
         esp_err_t err_set_hostname = tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, _wifiConfig.hostname.c_str());
         if (err_set_hostname != ESP_OK) {
             ESP_LOGE(TAG, "Failed to get hostname: %d", err_set_hostname);
-        }
-
-        // xTaskCreate(
-        //     [](void *arg) {
-        //         WifiClient &_this = *(WifiClient*)arg;
-        //         _this.taskEventNotify();
-        //     }, "WaitWifiEvents", 2048, this, 10, nullptr
-        // );
-    }
-
-    void WifiClient::taskEventNotify() {
-        while (true) {
-            EventBits_t bits = xEventGroupWaitBits(
-                this->_wifiEventGroup,
-                WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
-                pdFALSE,
-                pdFALSE,
-                portMAX_DELAY);
-
-            if (bits & WIFI_CONNECTED_BIT)
-            {
-                ESP_LOGI(TAG, "CONNECTED TO WIFI");
-            }
         }
     }
 }

@@ -10,6 +10,8 @@
 #include "esp_wifi.h"
 #include "esp_netif.h"
 
+#include "scale/events.h"
+
 namespace scale::wifi {
     struct AP {
         std::string ssid;
@@ -18,6 +20,7 @@ namespace scale::wifi {
 
     struct WifiConfig {
         std::string hostname;
+        esp_event_loop_handle_t eventLoop;
     };
 
     struct WifiEvents {
@@ -28,17 +31,11 @@ namespace scale::wifi {
     public:
         WifiClient(const WifiConfig &wifiConfig);
         void start(AP accessPoint, size_t accessPointsLen);
-
-        EventGroupHandle_t eventGroup() {
-            return this->_wifiEventGroup;
-        }
     private:
         static void static_got_ip_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
         void got_ip_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
         static void static_wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
         void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
-
-        void taskEventNotify();
 
         WifiConfig _wifiConfig;
         EventGroupHandle_t _wifiEventGroup;

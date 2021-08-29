@@ -6,7 +6,7 @@
 #include "scale/color_report.h"
 #include "mqtt_report.h"
 #include "maintenance.h"
-#include "scale_lcd.h"
+#include "scale/lcd.h"
 
 #include "scale/events.h"
 

@@ -8,7 +8,7 @@
 
 namespace scale::tare {
     struct TareConfig {
-        float tareGrams;
+        float zeroAtGrams;
     };
 
     class TareConfigBuilder {
@@ -25,26 +25,38 @@ namespace scale::tare {
 
     class Tare {
     public:
-        Tare(persistence::TarePersistence &persistence): _persistence(persistence) {
-            persistence::TareSaveData saveData = _persistence.load();
-            TareConfig tareConfig = {
-                .tareGrams=saveData.tareGrams,
-            };
-            _config = tareConfig; 
-        }
-    
+        Tare(persistence::TarePersistence &persistence, esp_event_loop_handle_t eventLoop);
+
         void update(const TareConfig &config) {
+            _taring = false;
             _config = config;
             persistence::TareSaveData saveData = {
-                .tareGrams = config.tareGrams,
+                .tareGrams = config.zeroAtGrams,
             };
             _persistence.save(saveData);
+
+            events::EventTareComplete evt = {};
+            esp_event_post_to(
+                _eventLoop,
+                events::SCALE_EVENT,
+                events::EVENT_TARE_COMPLETE,
+                &evt,
+                sizeof(evt),
+                portMAX_DELAY
+            );
         }
         float tare(float grams) {
-            return grams - _config.tareGrams;
+            return grams - _config.zeroAtGrams;
         }
     private:
+        void onRawWeightChanged(const events::EventRawWeightChanged &evt);
+        void onStabilizedWeightChanged(const events::EventStabilizedWeightChanged &evt);
+        void onTareRequested(const events::EventTareStarted &evt);
+
+        bool _taring;
+
         TareConfig _config;
         persistence::TarePersistence &_persistence;
+        esp_event_loop_handle_t _eventLoop;
     };
 }

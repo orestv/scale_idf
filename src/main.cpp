@@ -37,9 +37,8 @@
 
 #include "maintenance.h"
 
+#include "scale/lcd.h"
 #include "scale/controller.h"
-
-#include "scale_lcd.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
 
@@ -140,7 +139,7 @@ void app_main(void)
     scale::persistence::TarePersistence tarePersistence;
     
     scale::tare::TareConfigBuilder tareConfigBuilder;
-    scale::tare::Tare tare(tarePersistence);
+    scale::tare::Tare tare(tarePersistence, scaleEventLoop);
 
     scale::wifi::WifiClient wifiClient({.hostname=AP_HOSTNAME});
     wifiClient.start(
@@ -169,6 +168,7 @@ void app_main(void)
     scale::lcd::LCDConfig lcdConfig = {
         .gpioSDA = GPIO_LCD_SDA,
         .gpioSCL = GPIO_LCD_SCL,
+        .eventLoop = scaleEventLoop,
     };
     scale::lcd::LCD lcd(lcdConfig);
     lcd.start();

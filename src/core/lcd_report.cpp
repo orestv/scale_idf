@@ -1,4 +1,4 @@
-#include "scale_lcd.h"
+#include "scale/lcd.h"
 
 #include "sstream"
 #include <iomanip>
@@ -78,6 +78,24 @@ namespace scale::lcd {
         xQueueSend(_eventQueue, &event, portMAX_DELAY);
     }
 
+    void LCD::onWeightChanged(const events::EventStabilizedTaredWeightChanged &evt) {
+        setWeight(evt.grams);
+    }
+
+    void LCD::subscribeToEvents() {
+        esp_event_handler_register_with(
+            _config.eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_STABILIZED_TARED_WEIGHT_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                LCD &_this = *(LCD*)arg;
+                auto &evt = *(events::EventStabilizedTaredWeightChanged*)event_data;
+                _this.onWeightChanged(evt);
+            }, 
+            this
+        );
+    }
+
     void LCD::init() {
         int i2c_master_port = I2C_NUM_0;
         i2c_port_t i2c_num = I2C_MASTER_NUM;
@@ -106,5 +124,6 @@ namespace scale::lcd {
                                          4, 20, 20));
 
         ESP_ERROR_CHECK(i2c_lcd1602_reset(_lcdInfo));
+        subscribeToEvents();
     }
 }

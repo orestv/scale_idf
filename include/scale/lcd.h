@@ -11,6 +11,8 @@
 #include "sdkconfig.h"
 #include "rom/uart.h"
 
+#include "scale/events.h"
+
 #include "smbus.h"
 #include "i2c-lcd1602.h"
 
@@ -24,6 +26,7 @@ namespace scale::lcd {
     struct LCDConfig {
         gpio_num_t gpioSDA;
         gpio_num_t gpioSCL;
+        esp_event_loop_handle_t eventLoop;
     };
 
     struct LCDEvent {
@@ -47,6 +50,7 @@ namespace scale::lcd {
     private:
 
         void init();
+        void subscribeToEvents();
         void taskLoop();
 
         void requestRedraw();
@@ -55,6 +59,8 @@ namespace scale::lcd {
         void renderWifi();
         void renderMQTT();
         void renderWeight();
+
+        void onWeightChanged(const events::EventStabilizedTaredWeightChanged &evt);
 
         xQueueHandle _eventQueue;
 

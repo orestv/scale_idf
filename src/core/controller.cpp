@@ -86,6 +86,7 @@ namespace scale::controller {
     }
 
     void ScaleController::onRawWeightChanged(const events::EventRawWeightChanged &event) {
+        return;
         ESP_LOGD(TAG, "Raw weight changed");
         if (_taring) {
             ESP_LOGD(TAG, "Taring");

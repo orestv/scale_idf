@@ -10,10 +10,13 @@
 
 #include <hx711.h>
 
+#include "scale_events.h"
+
 namespace scale::raw {
     struct ScaleConfig {
         gpio_num_t gpioDAT;
         gpio_num_t gpioCLK;
+        esp_event_loop_handle_t eventLoop;
     };
 
     struct ScaleEvent {

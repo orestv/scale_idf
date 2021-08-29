@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "scale_events.h"
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <driver/gpio.h>
@@ -9,6 +11,7 @@
 namespace scale::peri::button {
     struct ButtonConfig {
         gpio_num_t buttonGPIO;
+        esp_event_loop_handle_t eventLoop;
     };
 
     struct ButtonEvent {

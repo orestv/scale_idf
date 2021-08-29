@@ -21,6 +21,7 @@
 #include "wifi.h"
 #include "led.h"
 #include "color_report.h"
+#include "mqtt_report.h"
 #include "mqtt.h"
 
 #include "scale_button.h"
@@ -33,10 +34,6 @@
 #include "adapted_scale.h"
 #include "tare_persistence.h"
 #include "tare_controller.h"
-
-#include "wifi.h"
-#include "mqtt.h"
-#include "mqtt_report.h"
 
 #include "maintenance.h"
 
@@ -89,16 +86,31 @@ void app_main(void)
 {
     init_esp();
 
+    esp_event_loop_args_t eventLoopArgs = {
+        .queue_size=40,
+        .task_name="ScaleEvents",
+        .task_priority=15,
+        .task_stack_size=4096,
+    };
+    esp_event_loop_handle_t scaleEventLoop;
+    esp_event_loop_create(&eventLoopArgs, &scaleEventLoop);
+
     scale::led::LEDPins ledPins{
         .gpio_red = GPIO_RGB_RED,
         .gpio_green = GPIO_RGB_GREEN,
         .gpio_blue = GPIO_RGB_BLUE,
     };
     scale::led::LED led(ledPins);
-    scale::color::ColorReport colorReport(led);
+
+    scale::color::ColorReportArgs colorReportArgs = {
+        .led = led,
+        .eventLoop = scaleEventLoop,
+    };
+    scale::color::ColorReport colorReport(colorReportArgs);
     scale::peri::button::PushButton buttonTare(
         {
             .buttonGPIO = GPIO_BUTTON_TARE,
+            .eventLoop = scaleEventLoop,
         }
     );
     scale::peri::button::PushButton buttonMaintenance(
@@ -109,6 +121,7 @@ void app_main(void)
         {
             .gpioDAT = GPIO_HX711_DAT,
             .gpioCLK = GPIO_HX711_CLK,
+            .eventLoop = scaleEventLoop,
         }
     );
 
@@ -121,8 +134,8 @@ void app_main(void)
 
     scale::stabilized::Stabilizer stabilizer({.dataPoints=5, .margin=0.5});
     
-    scale::adapted::AdaptedScale adaptedScale(rawScale, converter);
-    scale::stabilized::StabilizedScale stabilizedScale(adaptedScale, stabilizer);
+    scale::adapted::AdaptedScale adaptedScale(rawScale, converter, scaleEventLoop);
+    scale::stabilized::StabilizedScale stabilizedScale(stabilizer, scaleEventLoop);
 
     scale::persistence::TarePersistence tarePersistence;
     
@@ -140,6 +153,7 @@ void app_main(void)
     scale::mqtt::MQTTClient mqttClient(
         {.brokerUrl=MQTT_BROKER_URL}, {}
     );
+    mqttClient.start();
 
     scale::mqtt::MQTTReportConfig reportConfig = {
         .topics = {

@@ -9,6 +9,8 @@
 #include "raw_scale.h"
 #include "weight_converter.h"
 
+#include "scale_events.h"
+
 namespace scale::adapted {
     struct ScaleEvent {
         float grams;
@@ -16,21 +18,18 @@ namespace scale::adapted {
 
     class AdaptedScale {
     public:
-        AdaptedScale(raw::Scale &scale, raw::GramConverter &converter):
+        AdaptedScale(raw::Scale &scale, raw::GramConverter &converter, esp_event_loop_handle_t eventLoop):
             _scale(scale), 
-            _converter(converter) {
-            
-            _eventQueue = xQueueCreate(20, sizeof(ScaleEvent));
+            _converter(converter),
+            _eventLoop(eventLoop) {
 
             start();
         }
 
-        ScaleEvent getEvent();
-
     private:
         void start();
 
-        ScaleEvent convertEvent(const raw::ScaleEvent &incomingEvent) const;
+        events::EventRawWeightChanged convertEvent(const raw::ScaleEvent &incomingEvent) const;
         void processEvent(const raw::ScaleEvent &incomingEvent);
 
         void task();
@@ -38,6 +37,6 @@ namespace scale::adapted {
         raw::Scale &_scale;
         raw::GramConverter &_converter;
 
-        xQueueHandle _eventQueue;
+        esp_event_loop_handle_t _eventLoop;
     };
 }

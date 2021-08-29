@@ -16,18 +16,18 @@ namespace scale::adapted {
         }
     }
 
-    ScaleEvent AdaptedScale::getEvent() {
-        ScaleEvent event;
-        xQueueReceive(this->_eventQueue, &event, portMAX_DELAY);
-        return event;
-    }
-
     void AdaptedScale::processEvent(const raw::ScaleEvent &incomingEvent) {
-        ScaleEvent outgoingEvent = this->convertEvent(incomingEvent);
-        xQueueSend(this->_eventQueue, &outgoingEvent, portMAX_DELAY);
+        events::EventRawWeightChanged outgoingEvent = this->convertEvent(incomingEvent);
+        esp_event_post_to(
+            _eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_RAW_WEIGHT_CHANGED,
+            &outgoingEvent,
+            sizeof(outgoingEvent), portMAX_DELAY
+        );
     }
 
-    ScaleEvent AdaptedScale::convertEvent(const raw::ScaleEvent &incomingEvent) const {
+    events::EventRawWeightChanged AdaptedScale::convertEvent(const raw::ScaleEvent &incomingEvent) const {
         float grams = this->_converter.grams(incomingEvent.rawData);
         return {
             .grams = grams,

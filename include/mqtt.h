@@ -46,6 +46,7 @@ namespace scale::mqtt {
     class MQTTClient {
         public:
             MQTTClient(const MQTTConfig &config, const MQTTSubscriptionConfig &subscriptions);
+            void start();
 
             IncomingMQTTMessage getNextMessage(int timeoutMS);
             void send(OutgoingMQTTMessage message);

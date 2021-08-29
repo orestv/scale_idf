@@ -1,23 +1,39 @@
 #include "stabilized_scale.h"
 
+#include "esp_log.h"
+
 namespace scale::stabilized {
 
     void StabilizedScale::start() {
-        xTaskCreate(
-            [](void *arg) {
-                ((StabilizedScale*)arg)->task();
-            },
-            "StabilizedScale", 2048, this, 10, nullptr);
+        esp_event_handler_register_with(
+            _eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_RAW_WEIGHT_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                ESP_LOGI("Stabilized", "Processing event");
+                StabilizedScale &_this = *(StabilizedScale*)arg;
+                events::EventRawWeightChanged event = *(events::EventRawWeightChanged*)event_data;
+                _this.processEvent(event);
+                ESP_LOGI("Stabilized", "Event processed");
+            }, 
+            this
+        );
+            // xTaskCreate(
+            //     [](void *arg)
+            //     {
+            //         ((StabilizedScale *)arg)->task();
+            //     },
+            //     "StabilizedScale", 2048, this, 10, nullptr);
     }
 
-    void StabilizedScale::task() {
-        while (true) {
-            scale::adapted::ScaleEvent incomingEvent = _adaptedScale.getEvent();
-            processEvent(incomingEvent);
-        }        
-    }
+    // void StabilizedScale::task() {
+        // while (true) {
+            // scale::adapted::ScaleEvent incomingEvent = _adaptedScale.getEvent();
+            // processEvent(incomingEvent);
+        // }        
+    // }
 
-    void StabilizedScale::processEvent(const adapted::ScaleEvent &incomingEvent) {
+    void StabilizedScale::processEvent(const events::EventRawWeightChanged &incomingEvent) {
         _stabilizer.push(incomingEvent.grams);
         if (!_stabilizer.isStable()) {
             ScaleEvent outgoingEvent = {

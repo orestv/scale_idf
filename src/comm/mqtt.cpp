@@ -18,6 +18,10 @@ namespace scale::mqtt {
             _subscriptions(subscriptions),
             _isConnected(false)
     {
+        
+    }
+
+    void MQTTClient::start() {
         esp_mqtt_client_config_t mqtt_cfg = {
             .uri = _config.brokerUrl.c_str(),
         };
@@ -27,7 +31,7 @@ namespace scale::mqtt {
             (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID,
             [](void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
             {
-                MQTTClient &_this = *(MQTTClient*)handler_args;
+                MQTTClient &_this = *(MQTTClient *)handler_args;
                 _this.mqttEventHandler(base, event_id, event_data);
             },
             this);

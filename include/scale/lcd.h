@@ -51,12 +51,6 @@ namespace scale::lcd {
     private:
 
         void init();
-        void subscribeToEvents();
-        void taskLoop();
-
-        void requestRedraw();
-
-        void render();
 
         xQueueHandle _eventQueue;
         xQueueHandle _readyQueue;

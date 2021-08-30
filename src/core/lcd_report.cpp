@@ -13,7 +13,6 @@ namespace scale::lcd {
         _readyQueue = xQueueCreate(1, 0);
         _state = {
         };        
-        subscribeToEvents();
     }
 
     void LCD::start() {
@@ -29,13 +28,12 @@ namespace scale::lcd {
             [](void *arg) {
                 LCD &_this = *((LCD*)arg);
                 _this.init();
-                std::unique_ptr<BaseWidget> wifiWidget(new WifiWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
-                std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
-                std::unique_ptr<BaseWidget> weightWidget(new WeightWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
-                std::unique_ptr<BaseWidget> maintenanceWidget(new MaintenanceWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
-                std::unique_ptr<BaseWidget> weightReportWidget(new WeightReportWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
 
-                // _this._widgets.push_back(std::move(weightReportWidget));
+                WifiWidget wifiWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
+                MQTTWidget mqttWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
+                WeightWidget weightWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
+                MaintenanceWidget maintenanceWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
+                WeightReportWidget weightReportWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
 
                 xQueueSend(_this._readyQueue, nullptr, portMAX_DELAY);
                 while (true) {
@@ -47,26 +45,6 @@ namespace scale::lcd {
     
     void LCD::waitUntilReady() {
         xQueueReceive(_readyQueue, nullptr, portMAX_DELAY);
-    }
-
-    void LCD::taskLoop() {
-        LCDEvent evt;
-        if (!xQueueReceive(_eventQueue, &evt, portMAX_DELAY)) {
-            ESP_LOGI(TAG, "Timeout waiting for event");
-        }
-        // render();
-    }
-
-    void LCD::render() {
-
-    }
-
-    void LCD::requestRedraw() {
-        LCDEvent event;
-        xQueueSend(_eventQueue, &event, portMAX_DELAY);
-    }
-
-    void LCD::subscribeToEvents() {
     }
 
     void LCD::init() {

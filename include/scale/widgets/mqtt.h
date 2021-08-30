@@ -8,7 +8,7 @@
 namespace scale::lcd {
 class MQTTWidget: public BaseWidget {
    public:
-    MQTTWidget(i2c_lcd1602_info_t *lcdInfo, esp_event_loop_handle_t eventLoop);
+    MQTTWidget(i2c_lcd1602_info_t *lcdInfo, esp_event_loop_handle_t eventLoop, esp_event_loop_handle_t lcdEventLoop);
     virtual void render();
 
     bool _mqttConnected = false;

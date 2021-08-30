@@ -23,6 +23,7 @@ namespace scale::mqtt {
     }
 
     void MQTTClient::start() {
+        esp_mqtt_client_start(_espMqttClient);
         esp_mqtt_client_register_event(
             _espMqttClient,
             (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID,
@@ -42,11 +43,13 @@ namespace scale::mqtt {
                 auto &evt = *(events::EventWifiConnectionChanged*)event_data;
                 ESP_LOGI(TAG, "Received wifi update: %s", evt.connected ? "connected" : "disconnected");
                 if (evt.connected) {
-                    esp_mqtt_client_start(_this._espMqttClient);
+                    esp_mqtt_client_reconnect(_this._espMqttClient);
                 } else {
-                    esp_mqtt_client_stop(_this._espMqttClient);
-                    _this._isConnected = false;
-                    _this.emitConnectionStateChange();
+                    if (_this._isConnected) {
+                        // esp_mqtt_client_stop(_this._espMqttClient);
+                        _this._isConnected = false;
+                        _this.emitConnectionStateChange();
+                    }
                 }
             }, 
             this

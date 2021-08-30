@@ -17,25 +17,29 @@ namespace scale::lcd {
     }
 
     void LCD::start() {
+        esp_event_loop_args_t eventLoopArgs = {
+            .queue_size = 5,
+            .task_name = "LCDEvents",
+            .task_priority = 5,
+            .task_stack_size = 8192,
+        };
+        esp_event_loop_create(&eventLoopArgs, &_eventLoop);
+
         xTaskCreate(
             [](void *arg) {
                 LCD &_this = *((LCD*)arg);
                 _this.init();
-                std::unique_ptr<BaseWidget> wifiWidget(new WifiWidget(_this._lcdInfo, _this._config.eventLoop));
-                std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop));
-                std::unique_ptr<BaseWidget> weightWidget(new WeightWidget(_this._lcdInfo, _this._config.eventLoop));
-                std::unique_ptr<BaseWidget> maintenanceWidget(new MaintenanceWidget(_this._lcdInfo, _this._config.eventLoop));
-                std::unique_ptr<BaseWidget> weightReportWidget(new WeightReportWidget(_this._lcdInfo, _this._config.eventLoop));
+                std::unique_ptr<BaseWidget> wifiWidget(new WifiWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
+                std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
+                std::unique_ptr<BaseWidget> weightWidget(new WeightWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
+                std::unique_ptr<BaseWidget> maintenanceWidget(new MaintenanceWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
+                // std::unique_ptr<BaseWidget> weightReportWidget(new WeightReportWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
 
-                _this._widgets.push_back(std::move(wifiWidget));
-                _this._widgets.push_back(std::move(mqttWidget));
-                _this._widgets.push_back(std::move(weightWidget));
-                _this._widgets.push_back(std::move(maintenanceWidget));
-                _this._widgets.push_back(std::move(weightReportWidget));
-                
+                // _this._widgets.push_back(std::move(weightReportWidget));
+
                 xQueueSend(_this._readyQueue, nullptr, portMAX_DELAY);
                 while (true) {
-                    _this.taskLoop();
+                    vTaskDelay(portMAX_DELAY);
                 }
             }, "LCD", 8192, this, 10, nullptr
         );
@@ -50,13 +54,11 @@ namespace scale::lcd {
         if (!xQueueReceive(_eventQueue, &evt, portMAX_DELAY)) {
             ESP_LOGI(TAG, "Timeout waiting for event");
         }
-        render();
+        // render();
     }
 
     void LCD::render() {
-        for (auto &widget : _widgets) {
-            widget->render();
-        }
+        
     }
 
     void LCD::requestRedraw() {

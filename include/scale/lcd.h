@@ -26,6 +26,7 @@
 #define I2C_MASTER_RX_BUF_LEN 0 // disabled
 #define I2C_MASTER_FREQ_HZ 100000
 
+
 namespace scale::lcd {
 
     struct LCDConfig {
@@ -61,6 +62,8 @@ namespace scale::lcd {
         xQueueHandle _readyQueue;
 
         std::vector<std::unique_ptr<BaseWidget>> _widgets;
+
+        esp_event_loop_handle_t _eventLoop;
 
         LCDState _state;
 

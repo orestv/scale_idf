@@ -5,8 +5,7 @@
 namespace scale::lcd {
 class WeightWidget : public BaseWidget {
    public:
-    WeightWidget(i2c_lcd1602_info_t *lcdInfo,
-                 esp_event_loop_handle_t eventLoop);
+    WeightWidget(i2c_lcd1602_info_t *lcdInfo, esp_event_loop_handle_t eventLoop, esp_event_loop_handle_t lcdEventLoop);
     void render();
 
    private:

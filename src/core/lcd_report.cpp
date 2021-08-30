@@ -33,7 +33,7 @@ namespace scale::lcd {
                 std::unique_ptr<BaseWidget> mqttWidget(new MQTTWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
                 std::unique_ptr<BaseWidget> weightWidget(new WeightWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
                 std::unique_ptr<BaseWidget> maintenanceWidget(new MaintenanceWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
-                // std::unique_ptr<BaseWidget> weightReportWidget(new WeightReportWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
+                std::unique_ptr<BaseWidget> weightReportWidget(new WeightReportWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop));
 
                 // _this._widgets.push_back(std::move(weightReportWidget));
 
@@ -58,7 +58,7 @@ namespace scale::lcd {
     }
 
     void LCD::render() {
-        
+
     }
 
     void LCD::requestRedraw() {

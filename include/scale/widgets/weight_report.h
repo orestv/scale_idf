@@ -15,9 +15,11 @@ class WeightReportWidget : public BaseWidget {
     virtual void render();
 
    private:
-    void blip();
-    void renderBlip();
+    void scheduleBlink(bool blip);
 
+    bool _blink;
+
+    xTaskHandle _blipTask;
     xQueueHandle _blipQueue;    
 };
 }  // namespace scale::lcd

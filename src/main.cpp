@@ -80,6 +80,7 @@ void init_esp() {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT));
+    esp_wifi_set_ps(WIFI_PS_NONE);
 }
 
 void app_main(void)
@@ -89,11 +90,20 @@ void app_main(void)
     esp_event_loop_args_t eventLoopArgs = {
         .queue_size=40,
         .task_name="ScaleEvents",
-        .task_priority=15,
+        .task_priority=5,
         .task_stack_size=4096,
     };
     esp_event_loop_handle_t scaleEventLoop;
     esp_event_loop_create(&eventLoopArgs, &scaleEventLoop);
+
+    scale::lcd::LCDConfig lcdConfig = {
+        .gpioSDA = GPIO_LCD_SDA,
+        .gpioSCL = GPIO_LCD_SCL,
+        .eventLoop = scaleEventLoop,
+    };
+    scale::lcd::LCD lcd(lcdConfig);
+    lcd.start();
+    lcd.waitUntilReady();
 
     scale::led::LEDPins ledPins{
         .gpio_red = GPIO_RGB_RED,
@@ -159,15 +169,6 @@ void app_main(void)
         {.brokerUrl=MQTT_BROKER_URL, .eventLoop=scaleEventLoop}, {}
     );
     mqttClient.start();
-
-    scale::lcd::LCDConfig lcdConfig = {
-        .gpioSDA = GPIO_LCD_SDA,
-        .gpioSCL = GPIO_LCD_SCL,
-        .eventLoop = scaleEventLoop,
-    };
-    scale::lcd::LCD lcd(lcdConfig);
-    lcd.start();
-    lcd.waitUntilReady();
     
     scale::maintenance::Maintenance maintenance(scaleEventLoop);
 

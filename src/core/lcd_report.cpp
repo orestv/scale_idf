@@ -19,7 +19,7 @@ namespace scale::lcd {
         esp_event_loop_args_t eventLoopArgs = {
             .queue_size = 5,
             .task_name = "LCDEvents",
-            .task_priority = 5,
+            .task_priority = 50,
             .task_stack_size = 8192,
         };
         esp_event_loop_create(&eventLoopArgs, &_eventLoop);
@@ -57,6 +57,7 @@ namespace scale::lcd {
         conf.scl_io_num = _config.gpioSCL;
         conf.scl_pullup_en = GPIO_PULLUP_DISABLE; // GY-2561 provides 10kΩ pullups
         conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
+        conf.clk_flags = 0;
         i2c_param_config(i2c_master_port, &conf);
         i2c_driver_install(i2c_master_port, conf.mode,
                            0,

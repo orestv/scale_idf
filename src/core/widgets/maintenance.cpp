@@ -42,7 +42,7 @@ MaintenanceWidget::MaintenanceWidget(
 }
 
 void MaintenanceWidget::render() {
-    const char *sMaintenance = _maintenanceOn ? "MAINTENANCE" : "           ";
+    const char *sMaintenance = _maintenanceOn ? "MAINTENANCE" : "             ";
     i2c_lcd1602_move_cursor(lcdInfo(), 0, 0);
     i2c_lcd1602_write_string(lcdInfo(), sMaintenance);
 }

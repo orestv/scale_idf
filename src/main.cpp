@@ -39,6 +39,8 @@
 
 #include "scale/events.h"
 
+#include "scale/ota.h"
+
 #include "scale/lcd.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
@@ -51,9 +53,9 @@ const std::string MQTT_BROKER_URL = "mqtt://openhab";
 const std::string MQTT_TOPIC_WEIGHT = "/feeder/weight";
 const std::string MQTT_TOPIC_STABLE = "/feeder/stable";
 
-const gpio_num_t GPIO_RGB_RED = GPIO_NUM_32;
-const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_25;
-const gpio_num_t GPIO_RGB_BLUE = GPIO_NUM_26;
+const gpio_num_t GPIO_RGB_RED = GPIO_NUM_27;
+const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_26;
+const gpio_num_t GPIO_RGB_BLUE = GPIO_NUM_25;
 
 const gpio_num_t GPIO_BUTTON_TARE = GPIO_NUM_13;
 const gpio_num_t GPIO_BUTTON_MAINTENANCE = GPIO_NUM_15;
@@ -182,6 +184,12 @@ void app_main(void)
         .eventLoop = scaleEventLoop,
     };
     scale::mqtt::MQTTReport mqttReport(reportConfig);
+
+    scale::ota::OTAConfig otaConfig = {
+        .eventLoop = scaleEventLoop,
+    };
+    scale::ota::OTA ota(otaConfig);
+    ota.start();
 
     while (true) {
         vTaskDelay(portMAX_DELAY);

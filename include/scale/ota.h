@@ -15,6 +15,14 @@ class OTA {
     void start();
 
    private:
+    esp_err_t httpEventHandler(esp_http_client_event_t *evt);
+
+    void emitUpdateStarted();
+    void emitUpdatePercentageChanged(int pct);
+    void emitUpdateComplete(bool isSuccess);
+
+    void emitEvent(events::EventUpdateStateChange event);
+
     OTAConfig _config;
     xTaskHandle _otaTask;
 };

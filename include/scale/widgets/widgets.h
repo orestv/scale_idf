@@ -8,6 +8,7 @@ namespace scale::lcd {
     class WeightWidget;
     class MaintenanceWidget;
     class WeightReportWidget;
+    class UpdateWidget;
 }
 
 #include "wifi.h"
@@ -15,3 +16,4 @@ namespace scale::lcd {
 #include "weight.h"
 #include "maintenance.h"
 #include "weight_report.h"
+#include "update.h"

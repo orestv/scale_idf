@@ -13,6 +13,7 @@ namespace scale::lcd::events {
         EVENT_MQTT_CONNECTION_CHANGE,
         EVENT_MAINTENANCE_CHANGE,
         EVENT_WEIGHT_REPORTED_BLINK,
+        EVENT_UPDATE_STATE_CHANGED,
     };
 
     struct BaseEvent {
@@ -45,5 +46,10 @@ namespace scale::lcd::events {
     struct EventWeightReportedBlink : BaseEvent {
         static const Event event_id = EVENT_WEIGHT_REPORTED_BLINK;
         bool blink;
+    };
+    struct EventUpdateStateChanged : BaseEvent {
+        static const Event event_id = EVENT_UPDATE_STATE_CHANGED;
+        bool isUpdateRunning;
+        int updatePercentage;
     };
 }

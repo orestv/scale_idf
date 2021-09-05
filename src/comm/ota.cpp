@@ -1,9 +1,10 @@
 #include "scale/ota.h"
 
+#include <string>
+
 #include "esp_log.h"
 #include "scale/events.h"
 #include "stdio.h"
-#include <string>
 
 #define HTTP_BUF_SIZE (8192 * 4)
 
@@ -12,10 +13,10 @@ const char *TAG = "OTA";
 
 using namespace std;
 
-esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
+esp_err_t OTA::httpEventHandler(esp_http_client_event_t *evt) {
     static int content_length = 0;
     static int collected_data = 0;
-    
+
     string hdr;
     string exp("Content-Length");
     static int lastPct = -1;
@@ -45,6 +46,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
                 if (pct != lastPct) {
                     ESP_LOGI(TAG, "Downloading OTA, %d%% done", pct);
                     lastPct = pct;
+                    emitUpdatePercentageChanged(pct);
                 }
             }
             // ESP_LOGI(TAG, "HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
@@ -61,14 +63,14 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
     return ESP_OK;
 }
 
-OTA::OTA(const OTAConfig &config): _config(config) {
+OTA::OTA(const OTAConfig &config) : _config(config) {
     esp_event_handler_register_with(
         _config.eventLoop,
         events::SCALE_EVENT,
         ESP_EVENT_ANY_ID,
         [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
             auto &_this = *(OTA *)arg;
-            
+
             switch (event_id) {
                 case events::EVENT_MAINTENANCE_MODE_CHANGED: {
                     ESP_LOGI(TAG, "Caught maintenance change");
@@ -88,19 +90,60 @@ OTA::OTA(const OTAConfig &config): _config(config) {
         this);
 }
 
+void OTA::emitUpdateStarted() {
+    events::EventUpdateStateChange eventData = {
+        .isUpdating = true,
+        .updatePercentage = 0,
+    };
+    emitEvent(eventData);
+}
+
+void OTA::emitUpdatePercentageChanged(int pct) {
+    events::EventUpdateStateChange eventData = {
+        .isUpdating = true,
+        .updatePercentage = pct,
+    };
+    emitEvent(eventData);
+}
+
+void OTA::emitUpdateComplete(bool isSuccess) {
+    events::EventUpdateStateChange eventData = {
+        .isUpdating = false,
+        .updatePercentage = 0,
+    };
+    emitEvent(eventData);
+}
+
+void OTA::emitEvent(events::EventUpdateStateChange eventData) {
+    esp_event_post_to(
+        _config.eventLoop,
+        events::SCALE_EVENT,
+        events::EVENT_UPDATE_STATE_CHANGE,
+        &eventData,
+        sizeof(eventData),
+        portMAX_DELAY);
+}
+
 void OTA::start() {
     xTaskCreate(
         [](void *arg) {
             auto &_this = *(OTA*)arg;
+            auto httpEventHandler = [](esp_http_client_event_t *evt) {
+                auto &_this = *(OTA *)evt->user_data;
+                return _this.httpEventHandler(evt);
+            };
             while (true) {
                 ulTaskNotifyTake(1, portMAX_DELAY);
                 ESP_LOGI(TAG, "Trying to run OTA");
-                                               
+                
+                _this.emitUpdateStarted();
+
                 esp_http_client_config_t otaConfig = {
                     .url = "http://drifter:8000/firmware.bin",
                     .cert_pem = "",
-                    .event_handler = _http_event_handler,
+                    .event_handler = httpEventHandler,
                     .buffer_size = HTTP_BUF_SIZE,
+                    .user_data = arg,
                     .skip_cert_common_name_check = true,
                     .keep_alive_enable = true,
                 };
@@ -109,9 +152,10 @@ void OTA::start() {
                     esp_restart();
                 } else {
                     ESP_LOGE(TAG, "Firmware upgrade failed");
+                    _this.emitUpdateComplete(false);
                 }
             }
-        }, "OTA", 4096 + HTTP_BUF_SIZE, this, 5, &_otaTask
-    );
+        },
+        "OTA", 4096 + HTTP_BUF_SIZE, this, 5, &_otaTask);
 }
 }  // namespace scale::ota

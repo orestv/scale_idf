@@ -32,6 +32,9 @@ class BaseWidget {
     esp_event_loop_handle_t eventLoop() {
         return _eventLoop;
     }
+    esp_event_loop_handle_t lcdEventLoop() {
+        return _lcdEventLoop;
+    }
     i2c_lcd1602_info_t *lcdInfo() {
         return _lcdInfo;
     }

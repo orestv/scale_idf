@@ -34,6 +34,7 @@ namespace scale::lcd {
                 WeightWidget weightWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
                 MaintenanceWidget maintenanceWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
                 WeightReportWidget weightReportWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
+                UpdateWidget updateWidget(_this._lcdInfo, _this._config.eventLoop, _this._eventLoop);
 
                 xQueueSend(_this._readyQueue, nullptr, portMAX_DELAY);
                 while (true) {

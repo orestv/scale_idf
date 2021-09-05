@@ -53,18 +53,18 @@ const std::string MQTT_BROKER_URL = "mqtt://openhab";
 const std::string MQTT_TOPIC_WEIGHT = "/feeder/weight";
 const std::string MQTT_TOPIC_STABLE = "/feeder/stable";
 
-const gpio_num_t GPIO_RGB_RED = GPIO_NUM_27;
+const gpio_num_t GPIO_RGB_RED = GPIO_NUM_25;
 const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_26;
-const gpio_num_t GPIO_RGB_BLUE = GPIO_NUM_25;
+const gpio_num_t GPIO_RGB_BLUE = GPIO_NUM_27;
 
 const gpio_num_t GPIO_BUTTON_TARE = GPIO_NUM_13;
 const gpio_num_t GPIO_BUTTON_MAINTENANCE = GPIO_NUM_15;
 
-const gpio_num_t GPIO_HX711_CLK = GPIO_NUM_21;
-const gpio_num_t GPIO_HX711_DAT = GPIO_NUM_22;
+const gpio_num_t GPIO_HX711_CLK = GPIO_NUM_19;
+const gpio_num_t GPIO_HX711_DAT = GPIO_NUM_18;
 
 const gpio_num_t GPIO_LCD_SDA = GPIO_NUM_17;
-const gpio_num_t GPIO_LCD_SCL = GPIO_NUM_18;
+const gpio_num_t GPIO_LCD_SCL = GPIO_NUM_16;
 
 extern "C" {
     void app_main(void);

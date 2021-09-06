@@ -125,6 +125,8 @@ void OTA::emitEvent(events::EventUpdateStateChange eventData) {
 }
 
 void OTA::start() {
+    auto appDescription = esp_ota_get_app_description();
+    ESP_LOGI(TAG, "Current FW version: %s", appDescription->version);
     xTaskCreate(
         [](void *arg) {
             auto &_this = *(OTA*)arg;

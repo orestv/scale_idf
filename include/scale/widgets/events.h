@@ -14,6 +14,7 @@ namespace scale::lcd::events {
         EVENT_MAINTENANCE_CHANGE,
         EVENT_WEIGHT_REPORTED_BLINK,
         EVENT_UPDATE_STATE_CHANGED,
+        EVENT_BACKLIGHT_STATE_CHANGED,
     };
 
     struct BaseEvent {
@@ -51,5 +52,9 @@ namespace scale::lcd::events {
         static const Event event_id = EVENT_UPDATE_STATE_CHANGED;
         bool isUpdateRunning;
         int updatePercentage;
+    };
+    struct EventBacklightStateChanged : BaseEvent {
+        static const Event event_id = EVENT_BACKLIGHT_STATE_CHANGED;
+        bool isBacklightOn;
     };
 }

@@ -26,6 +26,31 @@ namespace scale::lcd {
 
         xTaskCreate(
             [](void *arg) {
+                LCD &_this = *((LCD *)arg);
+
+                const int LCD_TIMEOUT_MS = 5000;
+                const int LCD_TIMEOUT_TICKS = pdMS_TO_TICKS(LCD_TIMEOUT_MS);
+                while (true) {
+                    auto xNotifyCount = ulTaskNotifyTake(true, LCD_TIMEOUT_TICKS);
+                    if (xNotifyCount == 0) {
+                        ESP_LOGI(TAG, "LCD Backlight Timeout");
+
+                        events::EventBacklightStateChanged evt;
+                        evt.isBacklightOn = false;
+                        esp_event_post_to(
+                            _this._eventLoop,
+                            events::LCD_EVENT,
+                            events::EVENT_BACKLIGHT_STATE_CHANGED,
+                            &evt, sizeof(&evt), 0);
+                    } else {
+                        ESP_LOGI(TAG, "Movement detected, backlight timeout delayed");
+                    }
+                }
+            },
+            "BacklightTimeout", 2048, this, 2, &_taskBacklightTimeout);
+
+        xTaskCreate(
+            [](void *arg) {
                 LCD &_this = *((LCD*)arg);
                 _this.init();
 
@@ -42,6 +67,32 @@ namespace scale::lcd {
                 }
             }, "LCD", 8192, this, 10, nullptr
         );
+        esp_event_handler_register_with(
+            _config.eventLoop, scale::events::SCALE_EVENT,
+            scale::events::EVENT_MOVEMENT_DETECTED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                ESP_LOGI(TAG, "Movement detected");
+                auto &_this = *(LCD*)arg;
+                events::EventBacklightStateChanged evt;
+                evt.isBacklightOn = true;
+                esp_event_post_to(
+                    _this._eventLoop,
+                    events::LCD_EVENT,
+                    events::EVENT_BACKLIGHT_STATE_CHANGED,
+                    &evt, sizeof(&evt), 0
+                );
+                xTaskNotifyGive(_this._taskBacklightTimeout);
+            }, this
+        );
+
+        esp_event_handler_register_with(
+            _eventLoop, events::LCD_EVENT, events::EVENT_BACKLIGHT_STATE_CHANGED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                auto &_this = *(LCD *)arg;
+                auto &evt = *(events::EventBacklightStateChanged*)event_data;
+                i2c_lcd1602_set_backlight(_this._lcdInfo, evt.isBacklightOn);
+            },
+            this);
     }
     
     void LCD::waitUntilReady() {

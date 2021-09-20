@@ -27,6 +27,8 @@ enum Event {
     EVENT_WEIGHT_REPORTED,
 
     EVENT_UPDATE_STATE_CHANGE,
+
+    EVENT_MOVEMENT_DETECTED,
 };
 
 struct EventRawWeightChanged {

@@ -15,6 +15,8 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
+#include "esp_sntp.h"
+
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
@@ -40,7 +42,7 @@
 #include "scale/events.h"
 
 #include "scale/ota.h"
-
+#include "scale/presence.h"
 #include "scale/lcd.h"
 
 #define ESP_INTR_FLAG_DEFAULT 0
@@ -66,6 +68,8 @@ const gpio_num_t GPIO_HX711_DAT = GPIO_NUM_18;
 const gpio_num_t GPIO_LCD_SDA = GPIO_NUM_17;
 const gpio_num_t GPIO_LCD_SCL = GPIO_NUM_16;
 
+const gpio_num_t GPIO_PRESENCE = GPIO_NUM_33;
+
 extern "C" {
     void app_main(void);
 }
@@ -83,6 +87,10 @@ void init_esp() {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT));
     esp_wifi_set_ps(WIFI_PS_NONE);
+
+    sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    sntp_setservername(0, "pool.ntp.org");
+    sntp_init();
 }
 
 void app_main(void)
@@ -188,6 +196,11 @@ void app_main(void)
     scale::ota::OTAConfig otaConfig = {
         .eventLoop = scaleEventLoop,
     };
+    scale::presence::PresenceConfig presenceConfig = {
+        .detectorGPIO = GPIO_PRESENCE,
+        .eventLoop = scaleEventLoop,
+    };
+    scale::presence::PresenceDetector presenceDetector(presenceConfig);
     scale::ota::OTA ota(otaConfig);
     ota.start();
 

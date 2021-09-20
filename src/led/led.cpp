@@ -51,6 +51,42 @@ namespace scale::led {
             };
             ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
         }
+
+        // ledc_timer_config_t ledc_timer_LCD = {
+        //     .speed_mode = LEDC_MODE,
+        //     .duty_resolution = LEDC_DUTY_RES,
+        //     .timer_num = LEDC_TIMER_1,
+        //     .freq_hz = LEDC_FREQUENCY,  // Set output frequency at 5 kHz
+        //     .clk_cfg = LEDC_AUTO_CLK};
+        // ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer_LCD));
+
+        gpio_config_t backlightConfig = {
+            .pin_bit_mask = 1ULL << GPIO_NUM_23,
+            .mode = GPIO_MODE_OUTPUT,
+            .pull_up_en = GPIO_PULLUP_DISABLE,
+            .pull_down_en = GPIO_PULLDOWN_DISABLE,
+            .intr_type = GPIO_INTR_DISABLE,
+        };
+
+        gpio_config(&backlightConfig);
+        gpio_set_level(GPIO_NUM_23, 0);
+
+        // ledc_channel_config_t ledc_channel_LCD = {
+        //     .gpio_num = GPIO_NUM_23,
+        //     .speed_mode = LEDC_MODE,
+        //     .channel = LEDC_CHANNEL_3,
+        //     .intr_type = LEDC_INTR_DISABLE,
+        //     .timer_sel = LEDC_TIMER,
+        //     // .intr_type      = LEDC_INTR_DISABLE,
+        //     .duty = 0,  // Set duty to 0%
+        //     .hpoint = 0};
+        // ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel_LCD));
+
+        // float level = 0.9;
+        // int duty = (int)floor(maxDuty() * level);
+        // ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_3, duty));
+        // // Update duty to apply the new value
+        // ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_3));
     }
 
     void LED::setColor(const Color &color) {

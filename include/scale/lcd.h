@@ -58,6 +58,7 @@ namespace scale::lcd {
         std::vector<std::unique_ptr<BaseWidget>> _widgets;
 
         esp_event_loop_handle_t _eventLoop;
+        xTaskHandle _taskBacklightTimeout;
 
         LCDState _state;
 

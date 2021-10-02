@@ -17,9 +17,9 @@ namespace scale::peri::button {
         gpio_config_t buttonConfig = {
             .pin_bit_mask = 1ULL << _config.buttonGPIO,
             .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_ENABLE,
-            .intr_type = GPIO_INTR_POSEDGE,
+            .pull_up_en = GPIO_PULLUP_ENABLE,
+            .pull_down_en = GPIO_PULLDOWN_DISABLE,
+            .intr_type = GPIO_INTR_NEGEDGE,
         };
 
         xTaskCreate(
@@ -30,7 +30,7 @@ namespace scale::peri::button {
                     ESP_LOGD(_this.tag().c_str(), "Button receive q event");
                     auto level = gpio_get_level(_this._config.buttonGPIO);
                     ESP_LOGD(_this.tag().c_str(), "Button level: %i", level);
-                    if (level == 1) {
+                    if (level == 0) {
                         ESP_LOGD(_this.tag().c_str(), "Checking debouncer");
                         if (!_this._debouncer.trigger()) {
                             ESP_LOGD(_this.tag().c_str(), "Debouncer rejected button click, aborting");

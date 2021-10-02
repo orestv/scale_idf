@@ -65,8 +65,8 @@ const gpio_num_t GPIO_BUTTON_MAINTENANCE = GPIO_NUM_15;
 const gpio_num_t GPIO_HX711_CLK = GPIO_NUM_19;
 const gpio_num_t GPIO_HX711_DAT = GPIO_NUM_18;
 
-const gpio_num_t GPIO_LCD_SDA = GPIO_NUM_17;
-const gpio_num_t GPIO_LCD_SCL = GPIO_NUM_16;
+const gpio_num_t GPIO_LCD_SDA = GPIO_NUM_16;
+const gpio_num_t GPIO_LCD_SCL = GPIO_NUM_17;
 
 const gpio_num_t GPIO_PRESENCE = GPIO_NUM_33;
 
@@ -111,9 +111,9 @@ void app_main(void)
         .gpioSCL = GPIO_LCD_SCL,
         .eventLoop = scaleEventLoop,
     };
-    scale::lcd::LCD lcd(lcdConfig);
-    lcd.start();
-    lcd.waitUntilReady();
+    // scale::lcd::LCD lcd(lcdConfig);
+    // lcd.start();
+    // lcd.waitUntilReady();
 
     scale::led::LEDPins ledPins{
         .gpio_red = GPIO_RGB_RED,

@@ -111,9 +111,9 @@ void app_main(void)
         .gpioSCL = GPIO_LCD_SCL,
         .eventLoop = scaleEventLoop,
     };
-    // scale::lcd::LCD lcd(lcdConfig);
-    // lcd.start();
-    // lcd.waitUntilReady();
+    scale::lcd::LCD lcd(lcdConfig);
+    lcd.start();
+    lcd.waitUntilReady();
 
     scale::led::LEDPins ledPins{
         .gpio_red = GPIO_RGB_RED,

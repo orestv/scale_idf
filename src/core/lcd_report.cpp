@@ -37,11 +37,11 @@ namespace scale::lcd {
 
                         events::EventBacklightStateChanged evt;
                         evt.isBacklightOn = false;
-                        esp_event_post_to(
-                            _this._eventLoop,
-                            events::LCD_EVENT,
-                            events::EVENT_BACKLIGHT_STATE_CHANGED,
-                            &evt, sizeof(&evt), 0);
+                        // esp_event_post_to(
+                        //     _this._eventLoop,
+                        //     events::LCD_EVENT,
+                        //     events::EVENT_BACKLIGHT_STATE_CHANGED,
+                        //     &evt, sizeof(&evt), 0);
                     } else {
                         ESP_LOGI(TAG, "Movement detected, backlight timeout delayed");
                     }

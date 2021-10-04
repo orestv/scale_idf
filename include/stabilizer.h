@@ -24,6 +24,8 @@ namespace scale::stabilized {
         float _lastValue = 0;
         int _currentIndex = 0;
 
+        int _unstableValuesCount = 0;
+
         std::deque<float> _values;
         StabilizerConfig _config;
     };

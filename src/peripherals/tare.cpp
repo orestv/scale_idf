@@ -42,6 +42,19 @@ namespace scale::tare {
                 _this.onTareRequested();
             },
             this);
+        esp_event_handler_register_with(
+            eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_DRIFT_DETECTED,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                Tare &_this = *(Tare*)arg;
+                auto &evt = *(events::EventDriftDetected*)event_data;
+                TareConfig tareConfig = {
+                    .zeroAtGrams = _this._config.zeroAtGrams - evt.drift
+                };
+                _this.update(tareConfig);
+            },
+            this);        
     }
 
     void Tare::onRawWeightChanged(const events::EventRawWeightChanged &evt) {

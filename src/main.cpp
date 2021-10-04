@@ -157,7 +157,7 @@ void app_main(void)
         }
     );
 
-    scale::stabilized::Stabilizer stabilizer({.dataPoints=5, .margin=0.5});
+    scale::stabilized::Stabilizer stabilizer({.dataPoints=20, .margin=3});
     
     scale::adapted::AdaptedScale adaptedScale(rawScale, converter, scaleEventLoop);
     scale::stabilized::StabilizedScale stabilizedScale(stabilizer, scaleEventLoop);

@@ -24,6 +24,8 @@ enum Event {
     EVENT_BUTTON_TARE_PRESSED,
     EVENT_BUTTON_MAINTENANCE_PRESSED,
 
+    EVENT_DRIFT_DETECTED,
+
     EVENT_WEIGHT_REPORTED,
 
     EVENT_UPDATE_STATE_CHANGE,
@@ -63,5 +65,9 @@ struct EventTareComplete {};
 struct EventUpdateStateChange {
     bool isUpdating;
     int updatePercentage;
+};
+
+struct EventDriftDetected {
+    float drift;
 };
 }  // namespace scale::events

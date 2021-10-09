@@ -1,11 +1,14 @@
 #pragma once
 
 #include "esp_event.h"
+#include <string>
 
 namespace scale::events {
 ESP_EVENT_DECLARE_BASE(SCALE_EVENT);
 
 enum Event {
+    EVENT_LOG_MESSAGE,
+
     EVENT_RAW_WEIGHT_CHANGED,
     EVENT_RAW_TARED_WEIGHT_CHANGED,
     EVENT_STABILIZED_WEIGHT_CHANGED,
@@ -31,6 +34,10 @@ enum Event {
     EVENT_UPDATE_STATE_CHANGE,
 
     EVENT_MOVEMENT_DETECTED,
+};
+
+struct EventLogMessage {
+    std::string logMessage;
 };
 
 struct EventRawWeightChanged {

@@ -62,6 +62,12 @@ namespace scale::mqtt {
         }
     }
 
+    void MQTTReport::reportLog(const std::string &message) {
+        if (!_mqttClient.isConnected()) {
+
+        }
+    }
+
     MQTTDebouncer::MQTTDebouncer(uint periodMS) : _periodMS(periodMS), _published(false)
     {
     }

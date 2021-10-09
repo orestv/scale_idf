@@ -10,6 +10,7 @@ namespace scale::mqtt {
     struct MQTTReportTopics {
         std::string topicWeight;
         std::string topicStable;
+        std::string topicLogs;
     };
     struct MQTTReportConfig {  
         MQTTReportTopics topics;
@@ -42,6 +43,7 @@ namespace scale::mqtt {
     private:
         void reportWeight(float grams);
         void reportStable(bool stable);
+        void reportLog(const std::string &message);
 
         MQTTReportTopics _topics;
         MQTTClient &_mqttClient;

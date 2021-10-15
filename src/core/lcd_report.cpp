@@ -37,11 +37,11 @@ namespace scale::lcd {
 
                         events::EventBacklightStateChanged evt;
                         evt.isBacklightOn = false;
-                        // esp_event_post_to(
-                        //     _this._eventLoop,
-                        //     events::LCD_EVENT,
-                        //     events::EVENT_BACKLIGHT_STATE_CHANGED,
-                        //     &evt, sizeof(&evt), 0);
+                        esp_event_post_to(
+                            _this._eventLoop,
+                            events::LCD_EVENT,
+                            events::EVENT_BACKLIGHT_STATE_CHANGED,
+                            &evt, sizeof(&evt), 0);
                     } else {
                         ESP_LOGI(TAG, "Movement detected, backlight timeout delayed");
                     }
@@ -124,7 +124,7 @@ namespace scale::lcd {
 
         // Set up the LCD1602 device with backlight off
         _lcdInfo = i2c_lcd1602_malloc();
-        ESP_ERROR_CHECK(i2c_lcd1602_init(_lcdInfo, smbus_info, true,
+        ESP_ERROR_CHECK(i2c_lcd1602_init(_lcdInfo, smbus_info, false,
                                          4, 20, 20));
 
         ESP_ERROR_CHECK(i2c_lcd1602_reset(_lcdInfo));

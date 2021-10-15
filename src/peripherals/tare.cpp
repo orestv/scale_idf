@@ -49,10 +49,12 @@ namespace scale::tare {
             [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
                 Tare &_this = *(Tare*)arg;
                 auto &evt = *(events::EventDriftDetected*)event_data;
+                ESP_LOGI(TAG, "Handling drift of %.2f", evt.drift);
                 TareConfig tareConfig = {
-                    .zeroAtGrams = _this._config.zeroAtGrams - evt.drift
+                    .zeroAtGrams = _this._config.zeroAtGrams + evt.drift
                 };
                 _this.update(tareConfig);
+                ESP_LOGI(TAG, "Drift corrected for %.2f", evt.drift);
             },
             this);        
     }

@@ -72,16 +72,8 @@ OTA::OTA(const OTAConfig &config) : _config(config) {
             auto &_this = *(OTA *)arg;
 
             switch (event_id) {
-                case events::EVENT_MQTT_MESSAGE_RECEIVED: {
+                case events::EVENT_OTA_REQUESTED: {
                     xTaskNotifyGive(_this._otaTask);
-                }
-                case events::EVENT_MAINTENANCE_MODE_CHANGED: {
-                    ESP_LOGI(TAG, "Caught maintenance change");
-                    auto &event = *(events::EventMaintenanceModeChanged *)event_data;
-                    if (event.isMaintenanceModeOn) {
-                        xTaskNotifyGive(_this._otaTask);
-                    }
-                    break;
                 }
                 case events::EVENT_WIFI_CONNECTION_CHANGED: {
                     ESP_LOGI(TAG, "Caught wifi state change");
@@ -121,7 +113,7 @@ void OTA::emitEvent(events::EventUpdateStateChange eventData) {
     esp_event_post_to(
         _config.eventLoop,
         events::SCALE_EVENT,
-        events::EVENT_UPDATE_STATE_CHANGE,
+        events::EVENT_OTA_STATE_CHANGE,
         &eventData,
         sizeof(eventData),
         portMAX_DELAY);

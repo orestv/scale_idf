@@ -27,6 +27,7 @@
 #include "scale/color_report.h"
 #include "mqtt_report.h"
 #include "scale/mqtt.h"
+#include "scale/mqttBroker.h"
 
 #include "scale_button.h"
 
@@ -182,6 +183,12 @@ void app_main(void)
             .wpa2Password=AP_WPA2_PWD,
         }, 1
     );
+
+    scale::mqtt::MQTTBrokerConfig brokerConfig({
+        .eventLoop = scaleEventLoop,
+        .topicUpdate = MQTT_TOPIC_UPDATE,
+    });
+    scale::mqtt::MQTTBroker mqttBroker(brokerConfig);
 
     scale::mqtt::MQTTClient mqttClient(
         {

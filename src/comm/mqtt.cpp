@@ -92,17 +92,6 @@ namespace scale::mqtt {
             for (auto const &subscribeTopic : _config.subscribeTopics) {
                 esp_mqtt_client_subscribe(client, subscribeTopic.c_str(), 0);
             }
-            // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
-            // ESP_LOGD(TAG, "sent publish successful, msg_id=%d", msg_id);
-
-            // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
-            // ESP_LOGD(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-            // msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
-            // ESP_LOGD(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-            // msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
-            // ESP_LOGD(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
             break;
         case MQTT_EVENT_DISCONNECTED:
             _isConnected = false;
@@ -122,10 +111,10 @@ namespace scale::mqtt {
             ESP_LOGD(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
             break;
         case MQTT_EVENT_DATA: {
-            ESP_LOGD(TAG, "MQTT_EVENT_DATA");
+            ESP_LOGI(TAG, "MQTT_EVENT_DATA");
             events::EventMQTTMessageReceived msg = {
-                .topic=event->topic,
-                .message=event->data,
+                .topic=std::string(event->topic, event->topic_len),
+                .message=std::string(event->data, event->data_len),
             };
             esp_event_post_to(
                 _config.eventLoop,

@@ -12,7 +12,7 @@ UpdateWidget::UpdateWidget(
 
         esp_event_handler_register_with(
             eventLoop, scale::events::SCALE_EVENT,
-            scale::events::EVENT_UPDATE_STATE_CHANGE,
+            scale::events::EVENT_OTA_STATE_CHANGE,
             [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
                 auto &_this = *(UpdateWidget*)arg;
                 auto &scaleEvent = *(scale::events::EventUpdateStateChange*)event_data;

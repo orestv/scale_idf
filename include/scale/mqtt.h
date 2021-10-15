@@ -10,6 +10,7 @@
 namespace scale::mqtt {
     struct MQTTConfig {
         std::string brokerUrl;
+        std::vector<std::string> subscribeTopics;
         esp_event_loop_handle_t eventLoop;
     };
 

@@ -89,6 +89,9 @@ namespace scale::mqtt {
             ESP_LOGD(TAG, "MQTT_EVENT_CONNECTED");
             _isConnected = true;
             emitConnectionStateChange();
+            for (auto const &subscribeTopic : _config.subscribeTopics) {
+                esp_mqtt_client_subscribe(client, subscribeTopic.c_str(), 0);
+            }
             // msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
             // ESP_LOGD(TAG, "sent publish successful, msg_id=%d", msg_id);
 
@@ -118,11 +121,24 @@ namespace scale::mqtt {
         case MQTT_EVENT_PUBLISHED:
             ESP_LOGD(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
             break;
-        case MQTT_EVENT_DATA:
+        case MQTT_EVENT_DATA: {
             ESP_LOGD(TAG, "MQTT_EVENT_DATA");
+            events::EventMQTTMessageReceived msg = {
+                .topic=event->topic,
+                .message=event->data,
+            };
+            esp_event_post_to(
+                _config.eventLoop,
+                events::SCALE_EVENT,
+                events::EVENT_MQTT_MESSAGE_RECEIVED,
+                &msg,
+                sizeof(msg),
+                portMAX_DELAY
+            );
             printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
             printf("DATA=%.*s\r\n", event->data_len, event->data);
             break;
+        }
         case MQTT_EVENT_ERROR:
             ESP_LOGD(TAG, "MQTT_EVENT_ERROR");
             if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT)

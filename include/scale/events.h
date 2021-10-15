@@ -19,6 +19,8 @@ enum Event {
     EVENT_WIFI_CONNECTION_CHANGED,
     EVENT_MQTT_CONNECTION_CHANGED,
 
+    EVENT_MQTT_MESSAGE_RECEIVED,
+
     EVENT_TARE_STARTED,
     EVENT_TARE_COMPLETE,
 
@@ -60,6 +62,11 @@ struct EventWifiConnectionChanged {
 };
 struct EventMQTTConnectionChanged {
     bool connected;
+};
+
+struct EventMQTTMessageReceived {
+    std::string topic;
+    std::string message;
 };
 
 struct EventMaintenanceModeChanged {

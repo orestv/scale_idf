@@ -124,7 +124,7 @@ namespace scale::lcd {
 
         // Set up the LCD1602 device with backlight off
         _lcdInfo = i2c_lcd1602_malloc();
-        ESP_ERROR_CHECK(i2c_lcd1602_init(_lcdInfo, smbus_info, false,
+        ESP_ERROR_CHECK(i2c_lcd1602_init(_lcdInfo, smbus_info, true,
                                          4, 20, 20));
 
         ESP_ERROR_CHECK(i2c_lcd1602_reset(_lcdInfo));

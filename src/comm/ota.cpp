@@ -72,6 +72,9 @@ OTA::OTA(const OTAConfig &config) : _config(config) {
             auto &_this = *(OTA *)arg;
 
             switch (event_id) {
+                case events::EVENT_MQTT_MESSAGE_RECEIVED: {
+                    xTaskNotifyGive(_this._otaTask);
+                }
                 case events::EVENT_MAINTENANCE_MODE_CHANGED: {
                     ESP_LOGI(TAG, "Caught maintenance change");
                     auto &event = *(events::EventMaintenanceModeChanged *)event_data;
@@ -141,7 +144,7 @@ void OTA::start() {
                 _this.emitUpdateStarted();
 
                 esp_http_client_config_t otaConfig = {
-                    .url = "http://drifter:8000/firmware.bin",
+                    .url = "http://openhab/firmware/firmware.bin",
                     .cert_pem = "",
                     .event_handler = httpEventHandler,
                     .buffer_size = HTTP_BUF_SIZE,

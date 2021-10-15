@@ -5,6 +5,8 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 #include <string.h>
+#include <vector>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -54,6 +56,7 @@ const std::string AP_WPA2_PWD = "breakdown";
 const std::string MQTT_BROKER_URL = "mqtt://openhab";
 const std::string MQTT_TOPIC_WEIGHT = "/feeder/weight";
 const std::string MQTT_TOPIC_STABLE = "/feeder/stable";
+const std::string MQTT_TOPIC_UPDATE = "/feeder/update";
 
 const gpio_num_t GPIO_RGB_RED = GPIO_NUM_25;
 const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_26;
@@ -181,7 +184,12 @@ void app_main(void)
     );
 
     scale::mqtt::MQTTClient mqttClient(
-        {.brokerUrl=MQTT_BROKER_URL, .eventLoop=scaleEventLoop}, {}
+        {
+            .brokerUrl=MQTT_BROKER_URL,
+            .subscribeTopics={MQTT_TOPIC_UPDATE, },
+            .eventLoop=scaleEventLoop
+        },
+        {}
     );
     mqttClient.start();
     

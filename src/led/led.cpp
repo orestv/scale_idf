@@ -118,6 +118,6 @@ namespace scale::led {
     }
 
     int LED::maxDuty() const {
-        return 1 << LEDC_DUTY_RES;
+        return (1 << LEDC_DUTY_RES) / 16;
     }
 }

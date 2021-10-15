@@ -153,9 +153,8 @@ void app_main(void)
     scale::raw::GramConverter converter(
         {
             .zero = 0,
-            .coefficient = 0.0018,
-        }
-    );
+            .coefficient = 0.0008775316788936081,
+        });
 
     scale::stabilized::Stabilizer stabilizer(
         {

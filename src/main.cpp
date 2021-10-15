@@ -28,6 +28,7 @@
 #include "mqtt_report.h"
 #include "scale/mqtt.h"
 #include "scale/mqttBroker.h"
+#include "scale/mqtt_logger.h"
 
 #include "scale_button.h"
 
@@ -58,6 +59,7 @@ const std::string MQTT_BROKER_URL = "mqtt://openhab";
 const std::string MQTT_TOPIC_WEIGHT = "/feeder/weight";
 const std::string MQTT_TOPIC_STABLE = "/feeder/stable";
 const std::string MQTT_TOPIC_UPDATE = "/feeder/update";
+const std::string MQTT_TOPIC_LOG = "/feeder/log";
 
 const gpio_num_t GPIO_RGB_RED = GPIO_NUM_25;
 const gpio_num_t GPIO_RGB_GREEN = GPIO_NUM_26;
@@ -189,6 +191,11 @@ void app_main(void)
         .topicUpdate = MQTT_TOPIC_UPDATE,
     });
     scale::mqtt::MQTTBroker mqttBroker(brokerConfig);
+    scale::logger::MQTTLoggerConfig loggerConfig({
+        .eventLoop = scaleEventLoop,
+        .logTopic = MQTT_TOPIC_LOG,
+    });
+    scale::logger::MQTTLogger mqttLogger(loggerConfig);
 
     scale::mqtt::MQTTClient mqttClient(
         {

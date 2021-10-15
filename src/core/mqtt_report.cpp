@@ -24,6 +24,18 @@ namespace scale::mqtt {
             },
             this
         );
+        esp_event_handler_register_with(
+            _eventLoop,
+            events::SCALE_EVENT,
+            events::EVENT_LOG_MESSAGE,
+            [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
+                auto &_this = *(MQTTReport *)arg;
+                auto &event = *(events::EventLogMessage *)event_data;
+
+                _this.reportLog(event.logMessage);
+            },
+            this
+        );
     }
 
     void MQTTReport::reportWeight(float grams) {
@@ -64,8 +76,14 @@ namespace scale::mqtt {
 
     void MQTTReport::reportLog(const std::string &message) {
         if (!_mqttClient.isConnected()) {
-
+            return;
         }
+        OutgoingMQTTMessage msg{
+            .topic="/feeder/log",
+            .message=message,
+            .qos=0,
+        };
+        _mqttClient.send(msg);
     }
 
     MQTTDebouncer::MQTTDebouncer(uint periodMS) : _periodMS(periodMS), _published(false)

@@ -11,13 +11,13 @@ namespace scale::stabilized {
     const char *STAB_TAG = "Stabilizer";
 
     void Stabilizer::push(float value) {
-        ESP_LOGI(STAB_TAG, "Pushed weight %f", value);
+        ESP_LOGD(STAB_TAG, "Pushed weight %f", value);
         _lastValue = value;
         if (!_isNewValueStable(value)) {
-            ESP_LOGI(STAB_TAG, "New weight not stable");
+            ESP_LOGD(STAB_TAG, "New weight not stable");
             ++_unstableValuesCount;
             if (_unstableValuesCount > MAX_UNSTABLE_VALUE_COUNT) {
-                ESP_LOGI(STAB_TAG, "New weight over stability threshold, stability lost");
+                ESP_LOGD(STAB_TAG, "New weight over stability threshold, stability lost");
                 _loseStability();
             }
             return;
@@ -39,7 +39,7 @@ namespace scale::stabilized {
         float headAverage = getValue();
         float tailAverage = _tailAverage();
         float drift = tailAverage - headAverage;
-        ESP_LOGI(STAB_TAG, "Head %.2f, tail %.2f, drift %.2f", headAverage, tailAverage, drift);
+        ESP_LOGD(STAB_TAG, "Head %.2f, tail %.2f, drift %.2f", headAverage, tailAverage, drift);
         if (abs(drift) > MAX_DRIFT && abs(drift) < _config.margin) {
             ESP_LOGI(STAB_TAG, "Drift of %f exceeds %f", drift, MAX_DRIFT);
             events::EventDriftDetected eventData = {

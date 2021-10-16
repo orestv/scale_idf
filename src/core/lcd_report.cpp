@@ -69,19 +69,20 @@ namespace scale::lcd {
         );
         esp_event_handler_register_with(
             _config.eventLoop, scale::events::SCALE_EVENT,
-            scale::events::EVENT_MOVEMENT_DETECTED,
+            ESP_EVENT_ANY_ID,
             [](void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-                ESP_LOGI(TAG, "Movement detected");
-                auto &_this = *(LCD*)arg;
-                events::EventBacklightStateChanged evt;
-                evt.isBacklightOn = true;
-                esp_event_post_to(
-                    _this._eventLoop,
-                    events::LCD_EVENT,
-                    events::EVENT_BACKLIGHT_STATE_CHANGED,
-                    &evt, sizeof(&evt), 0
-                );
-                xTaskNotifyGive(_this._taskBacklightTimeout);
+                if (event_id == scale::events::EVENT_MOVEMENT_DETECTED || event_id == scale::events::EVENT_OTA_STATE_CHANGE) {
+                    ESP_LOGI(TAG, "Switching the light on");
+                    auto &_this = *(LCD *)arg;
+                    events::EventBacklightStateChanged evt;
+                    evt.isBacklightOn = true;
+                    esp_event_post_to(
+                        _this._eventLoop,
+                        events::LCD_EVENT,
+                        events::EVENT_BACKLIGHT_STATE_CHANGED,
+                        &evt, sizeof(&evt), 0);
+                    xTaskNotifyGive(_this._taskBacklightTimeout);
+                }                
             }, this
         );
 

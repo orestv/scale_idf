@@ -49,11 +49,11 @@
 #include "scale/presence.h"
 #include "scale/lcd.h"
 
+#include "secrets.h"
+
 #define ESP_INTR_FLAG_DEFAULT 0
 
 const std::string AP_HOSTNAME = "feeder";
-const std::string AP_SSID = "Rift2.4";
-const std::string AP_WPA2_PWD = "breakdown";
 
 const std::string MQTT_BROKER_URL = "mqtt://openhab";
 const std::string MQTT_TOPIC_WEIGHT = "/feeder/weight";
